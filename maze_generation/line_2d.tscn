@@ -1,3 +1,6 @@
 [gd_scene format=3 uid="uid://1wc4dqk4o4kx"]
 
+[sub_resource type="Gradient" id="Gradient_tvlxn"]
+
 [node name="Line2D" type="Line2D" unique_id=322201102]
+gradient = SubResource("Gradient_tvlxn")

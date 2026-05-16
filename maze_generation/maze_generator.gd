@@ -1,9 +1,12 @@
 extends Node
 
-const MAZE_WIDTH = 5
-const MAZE_HEIGHT = 5
+@export var MAZE_WIDTH: int = 5
+@export var MAZE_HEIGHT: int = 5
 var unvisited_cells: int
 var maze: Array
+
+var first_cell: Vector2
+var final_cell: Vector2
 
 const NORTH: Vector2 = Vector2(0, 1)
 const SOUTH: Vector2 = Vector2(0, -1)
@@ -15,17 +18,19 @@ const WEST: Vector2 = Vector2(-1, 0)
 
 func _ready() -> void:
 	seed(12345)
+	#randomize()
 	initialise_grid()
 	
 	unvisited_cells = MAZE_HEIGHT * MAZE_WIDTH
-	
+
 	aldous_broder()
 	
 	visualise_maze()
 	
-	#for i in range(MAZE_HEIGHT):
-		#for j in range(MAZE_WIDTH):
-			#maze[i][j].print_details()
+	for i in range(MAZE_HEIGHT):
+		for j in range(MAZE_WIDTH):
+			maze[i][j].print_details()
+
 
 func initialise_grid():
 	print("GRID INITIALISATION BEGINS")
@@ -44,6 +49,7 @@ func aldous_broder() -> void:
 	print("MAZE GENERATION BEGINS")
 	# Start at a random cell
 	var current_position: Vector2 = Vector2(randi() % MAZE_WIDTH, randi() % MAZE_HEIGHT)
+	first_cell = current_position
 	maze[current_position.x][current_position.y].visited = true
 	unvisited_cells -= 1
 	
@@ -68,6 +74,8 @@ func aldous_broder() -> void:
 					current_position += WEST 
 			if ((current_position.x >= 0 && current_position.x < MAZE_WIDTH) && (current_position.y >= 0 && current_position.y < MAZE_HEIGHT)):
 				loop = false
+			else:
+				current_position = previous_position
 		
 		# Check if this current cell has been visisted. If not, 'connect' it to previous cell
 		if (!maze[current_position.x][current_position.y].visited):
@@ -76,6 +84,7 @@ func aldous_broder() -> void:
 			maze[current_position.x][current_position.y].connects_to = previous_position
 			
 	print("MAZE GENERATION COMPLETE")
+	final_cell = current_position
 
 func visualise_maze() -> void:
 	for i in range(MAZE_HEIGHT):
@@ -84,6 +93,10 @@ func visualise_maze() -> void:
 			block_pos = block_pos * 100
 			var block = block_scene.instantiate()
 			block.position = block_pos
+			if (first_cell && (block_pos == first_cell * 100)):
+				block.rotation_degrees += 180
+			if (final_cell && (block_pos == final_cell * 100)):
+				block.rotation_degrees += 90
 			add_child(block)
 			
 			if (maze[i][j].connects_to):
