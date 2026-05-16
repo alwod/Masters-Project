@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://dwnpvdpbqmw6"]
+
+[ext_resource type="Script" uid="uid://c5hygsy65u8qu" path="res://maze_generation/maze_generator.gd" id="1_2040e"]
+[ext_resource type="PackedScene" uid="uid://bcgd44h2o1i8n" path="res://maze_generation/maze_block.tscn" id="2_pdvix"]
+
+[node name="MazeArea" type="Node2D" unique_id=2013573728]
+script = ExtResource("1_2040e")
+block_scene = ExtResource("2_pdvix")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=181169497]
+offset = Vector2(401.99, 202.97)

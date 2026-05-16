@@ -10,6 +10,8 @@ const SOUTH: Vector2 = Vector2(0, -1)
 const EAST: Vector2 = Vector2(1, 0)
 const WEST: Vector2 = Vector2(-1, 0)
 
+@export var block_scene: PackedScene
+
 func _ready() -> void:
 	seed(12345)
 	initialise_grid()
@@ -18,9 +20,11 @@ func _ready() -> void:
 	
 	aldous_broder()
 	
-	for i in range(MAZE_HEIGHT):
-		for j in range(MAZE_WIDTH):
-			maze[i][j].print_details()
+	visualise_maze()
+	
+	#for i in range(MAZE_HEIGHT):
+		#for j in range(MAZE_WIDTH):
+			#maze[i][j].print_details()
 
 func initialise_grid():
 	print("GRID INITIALISATION BEGINS")
@@ -71,3 +75,12 @@ func aldous_broder() -> void:
 			maze[current_position.x][current_position.y].connects_to = previous_position
 			
 	print("MAZE GENERATION COMPLETE")
+
+func visualise_maze() -> void:
+	for i in range(MAZE_HEIGHT):
+		for j in range(MAZE_WIDTH):
+			var block_pos: Vector2 = maze[i][j].position
+			block_pos = block_pos * 100
+			var block = block_scene.instantiate()
+			block.position = block_pos
+			add_child(block)

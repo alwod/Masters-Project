@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://bcgd44h2o1i8n"]
+
+[ext_resource type="Texture2D" uid="uid://bkv36dqtus52v" path="res://icon.svg" id="1_fxvn1"]
+
+[node name="MazeBlock" type="Node2D" unique_id=1866289994]
+scale = Vector2(0.4, 0.4)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1895123131]
+texture = ExtResource("1_fxvn1")
