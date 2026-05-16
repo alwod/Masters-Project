@@ -11,6 +11,7 @@ const EAST: Vector2 = Vector2(1, 0)
 const WEST: Vector2 = Vector2(-1, 0)
 
 @export var block_scene: PackedScene
+@export var line_scene: PackedScene
 
 func _ready() -> void:
 	seed(12345)
@@ -84,3 +85,9 @@ func visualise_maze() -> void:
 			var block = block_scene.instantiate()
 			block.position = block_pos
 			add_child(block)
+			
+			if (maze[i][j].connects_to):
+				var line: Line2D = line_scene.instantiate()
+				line.add_point(block_pos)
+				line.add_point(maze[i][j].connects_to * 100)
+				add_child(line)
