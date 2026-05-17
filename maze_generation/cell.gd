@@ -1,15 +1,16 @@
 class_name Cell
 
-var position: Vector2
+var grid_position: Vector2
 var visited: bool
 var connects_to: Vector2
+var connected_from: Vector2
 
-func _init(coords) -> void:
-	position = coords
+func _init(coords: Vector2i) -> void:
+	grid_position = coords
 	visited = false
 
 func print_details() -> void:
-	print("Position: ", position)
+	print("Position: ", grid_position)
 	print("Visited: ", visited)
 	if (connects_to):
 		print("Connects to: ", connects_to)

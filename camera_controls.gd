@@ -1,6 +1,6 @@
 extends Camera2D
 
-@export var SPEED: float = 1
+@export var SPEED: float
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
