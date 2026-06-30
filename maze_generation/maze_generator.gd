@@ -7,16 +7,18 @@ var maze: Array
 
 @export var use_random_seed: bool = false
 
-var first_cell: Vector2
-var final_cell: Vector2
+var first_cell: Vector2i
+var final_cell: Vector2i
 
-const NORTH: Vector2 = Vector2(0, 1)
-const SOUTH: Vector2 = Vector2(0, -1)
-const EAST: Vector2 = Vector2(1, 0)
-const WEST: Vector2 = Vector2(-1, 0)
+const NORTH: Vector2i = Vector2(0, 2)
+const SOUTH: Vector2i = Vector2(0, -2)
+const EAST: Vector2i = Vector2(2, 0)
+const WEST: Vector2i = Vector2(-2, 0)
 
 @export var block_scene: PackedScene
 @export var line_scene: PackedScene
+
+@export var maze_scale: int
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -24,18 +26,28 @@ func _ready() -> void:
 	else:
 		seed(12345)
 	
-	initialise_grid()
-	
 	unvisited_cells = MAZE_HEIGHT * MAZE_WIDTH
+	
+	# Modify the grid size, so that each "walkable" cell is surrounded by "wall" cells.
+	MAZE_HEIGHT = (MAZE_HEIGHT * 2) + 1
+	MAZE_WIDTH = (MAZE_WIDTH * 2) + 1
+	
+	initialise_grid()
 
 	aldous_broder()
-		
-	visualise_maze()
 	
-	for i in range(MAZE_HEIGHT):
-		for j in range(MAZE_WIDTH):
-			maze[i][j].print_details()
-	print(first_cell, final_cell)
+	reset_connecting_values()
+	
+	remove_random_walls()
+	
+	# Run the A* pathfinding algorithm on the given maze
+	var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	a_star.pathfinding()
+	
+	# Get the new maze from the pathfinder
+	maze = a_star.maze
+	
+	visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
@@ -53,17 +65,24 @@ func initialise_grid():
 			maze[i][j] = Cell.new(Vector2(i, j))
 
 func aldous_broder() -> void:
-	# Start at a random cell
-	var current_position: Vector2 = Vector2(randi() % MAZE_WIDTH, randi() % MAZE_HEIGHT)
-	var previous_position: Vector2
+	var current_position: Vector2i
+	var previous_position: Vector2i
+	
+	# Start at a random cell, making sure it's a walkable cell and not a wall cell
+	var loop_2 = true
+	while (loop_2):
+		current_position = Vector2i(randi() % MAZE_WIDTH, randi() % MAZE_HEIGHT)
+		if (!maze[current_position.x][current_position.y].is_wall):
+			loop_2 = false
+	
 	first_cell = current_position
 	maze[current_position.x][current_position.y].visited = true
 	unvisited_cells -= 1
 	
 	# The main loop. Repeat until every cell in the area has been visited
 	while (unvisited_cells > 0):
-		print("Unvisited cells: ", unvisited_cells)
-		print("Currently at: ", current_position)
+		#print("Unvisited cells: ", unvisited_cells)
+		#print("Currently at: ", current_position)
 		previous_position = current_position
 		
 		# Move in a random direction
@@ -88,30 +107,77 @@ func aldous_broder() -> void:
 			maze[current_position.x][current_position.y].visited = true
 			unvisited_cells -=1
 			maze[current_position.x][current_position.y].connects_to = previous_position
+			find_connecting_walls(current_position, previous_position)
 			maze[previous_position.x][previous_position.y].connected_from = current_position
+			find_connecting_walls(previous_position, current_position)
 			
 	final_cell = current_position
 
+func find_connecting_walls(position_1: Vector2i, position_2: Vector2i) -> void:
+	# First, subtract the current cell from the cell position it connects to
+	# Either X or Y should be equal to 0, not both.
+	# Whichever value ends up being 0 should be kept the same.
+	# Meanwhile the larger vector's non locked-in value is subtracted by 1
+	# The resulting vector should be inbetween the original 2 vectors
+	var middle_position: Vector2i
+	
+	var larger_position: Vector2i
+	if (position_1 > position_2):
+		larger_position = position_1
+	else:
+		larger_position = position_2
+	
+	var zero_checker = position_1 - position_2
+	if (zero_checker.x == 0):
+		larger_position.y -= 1
+	else:
+		larger_position.x -= 1
+		
+	maze[larger_position.x][larger_position.y].is_wall = false
+
+func remove_random_walls() -> void:
+	var number_to_remove: int = round(MAZE_HEIGHT / 2)
+	
+	var offset = 2
+	
+	var rand_x = randi_range(1, MAZE_HEIGHT - offset)
+	var rand_y = randi_range(1, MAZE_WIDTH - offset)
+	
+	for n in range(number_to_remove - 1):
+		while(!maze[rand_x][rand_y].is_wall):
+			rand_x = randi_range(1, MAZE_HEIGHT - offset)
+			rand_y = randi_range(1, MAZE_WIDTH - offset)
+		maze[rand_x][rand_y].is_wall = false
+
+
 func visualise_maze() -> void:
+	var goal_position: Vector2i
 	for i in range(MAZE_HEIGHT):
 		for j in range(MAZE_WIDTH):
-			var block_pos: Vector2 = maze[i][j].grid_position
-			block_pos = block_pos * 100
-			var block: Sprite2D = block_scene.instantiate()
-			block.position = block_pos
-			if (first_cell && (block_pos == first_cell * 100)):
-				block.texture = load("res://maze_generation/start.png")
-			if (final_cell && (block_pos == final_cell * 100)):
-				block.texture = load("res://maze_generation/end.png")
-			add_child(block)
-			
-			if (maze[i][j].connects_to):
-				var line: Line2D = line_scene.instantiate()
-				line.add_point(block_pos)
-				line.add_point(maze[i][j].connects_to * 100)
-				add_child(line)
-			if (maze[i][j].connected_from):
-				var line: Line2D = line_scene.instantiate()
-				line.add_point(block_pos)
-				line.add_point(maze[i][j].connected_from * 100)
-				add_child(line)
+			if (maze[i][j].is_wall):
+				var block_pos: Vector2i = maze[i][j].grid_position
+				block_pos = block_pos * maze_scale
+				var block: Sprite2D = block_scene.instantiate()
+				block.position = block_pos
+				add_child(block)
+			if (maze[i][j].is_goal):
+				goal_position = maze[i][j].grid_position
+	draw_path(goal_position)
+
+# Resets the variables connects_to and connected_from as they are needed by pathfinding algorithms
+func reset_connecting_values() -> void:
+	for i in range(MAZE_HEIGHT):
+		for j in range (MAZE_WIDTH):
+			maze[i][j].connects_to = Vector2i(-1, -1)
+			maze[i][j].connected_from = Vector2i(-1, -1)
+
+func draw_path(next_position: Vector2i) -> void:
+	#print(maze[next_position.x][next_position.y].print_details())
+	if (!maze[next_position.x][next_position.y].is_start):
+		# Draw line between next_position and next_position.connects_to
+		var line: Line2D = line_scene.instantiate()
+		line.add_point(next_position)
+		line.add_point(maze[next_position.x][next_position.y].connects_to)
+		add_child(line)
+		# call draw_path and pass in next_position.connects_to
+		draw_path(maze[next_position.x][next_position.y].connects_to)

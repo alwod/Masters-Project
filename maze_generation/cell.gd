@@ -1,13 +1,32 @@
 class_name Cell
 
-var grid_position: Vector2
-var visited: bool
-var connects_to: Vector2
-var connected_from: Vector2
+var grid_position: Vector2i # Used for maze generation
+var visited: bool # Used for maze generation
+var connected_from: Vector2i # Used for maze generation
+
+var connects_to: Vector2i # Used for maze generation and A*
+var is_wall: bool # Used for maze generation A*
+
+# Used for A*
+var f_cost = 0
+var g_cost = 0
+var h_cost = 0
+var is_start = false
+var is_goal = false
+var open_list = false
+var closed_list = false
 
 func _init(coords: Vector2i) -> void:
 	grid_position = coords
 	visited = false
+	
+	# Check if the cell is a wall cell or path cell
+	if ((grid_position.x % 2 == 0) || (grid_position.y % 2 == 0)):
+		is_wall = true
+	elif ((grid_position.x == 0) || (grid_position.y == 0)):
+		is_wall = true
+	else:
+		is_wall = false
 
 func print_details() -> void:
 	print("Position: ", grid_position)
