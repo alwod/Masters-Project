@@ -40,12 +40,15 @@ func _ready() -> void:
 	
 	remove_random_walls()
 	
-	# Run the A* pathfinding algorithm on the given maze
-	var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	a_star.pathfinding()
+	## Run the A* pathfinding algorithm on the given maze
+	#var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	#a_star.pathfinding()
+	## Get the new maze from the pathfinder
+	#maze = a_star.maze
 	
-	# Get the new maze from the pathfinder
-	maze = a_star.maze
+	# Run the Bees Algorithm on the given maze
+	var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	maze = bees.maze
 	
 	visualise_maze()
 
@@ -162,7 +165,7 @@ func visualise_maze() -> void:
 				add_child(block)
 			if (maze[i][j].is_goal):
 				goal_position = maze[i][j].grid_position
-	draw_path(goal_position)
+	#draw_path(goal_position) #Comment out when testing unfinished pathfinding algorithms
 
 # Resets the variables connects_to and connected_from as they are needed by pathfinding algorithms
 func reset_connecting_values() -> void:

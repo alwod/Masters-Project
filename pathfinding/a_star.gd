@@ -77,7 +77,9 @@ func check_neighbour_positions(current_position: Vector2i) -> void:
 	var east = current_position + Vector2i(1, 0)
 	var north_east = current_position + Vector2i(1, -1)
 	
-	var neighbours: Array[Vector2i] = [north, north_west, west, south_west, south, south_east, east, north_east]
+	#var neighbours_with_diagonals: Array[Vector2i] = [north, north_west, west, south_west, south, south_east, east, north_east]
+	var neighbours: Array[Vector2i] = [north, west, south, east]
+	
 	for node in neighbours:
 		if (!(maze[node.x][node.y].is_wall) && !maze[node.x][node.y].closed_list):
 			if (maze[node.x][node.y].open_list):
