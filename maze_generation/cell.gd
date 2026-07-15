@@ -8,13 +8,13 @@ var connects_to: Vector2i # Used for maze generation and A*
 var is_wall: bool # Used for maze generation A*
 
 # Used for A*
-var f_cost = 0
-var g_cost = 0
-var h_cost = 0
-var is_start = false
-var is_goal = false
-var open_list = false
-var closed_list = false
+var f_cost: int = 0
+var g_cost: int = 0
+var h_cost: int = 0
+var is_start: bool = false
+var is_goal: bool = false
+var open_list: bool = false
+var closed_list: bool = false
 
 func _init(coords: Vector2i) -> void:
 	grid_position = coords

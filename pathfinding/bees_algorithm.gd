@@ -17,6 +17,10 @@ var recruited_bees_for_remaining_best_sites: int
 var neighbourhood_size: int
 var stagnation_limit: int
 
+# If a solution intersects a wall or doesnt lead to the goal, the cost should be increased
+var wall_cost: int = 100
+var no_goal_cost: int = 200
+
 # Starting solutions
 var starting_solutions: Array[Beepath]
 var starting_solution_size: int = 1
@@ -27,6 +31,7 @@ var goal: Vector2i
 
 var maze: Array
 var maze_size: Vector2i
+var maze_area: int
 
 # Directions - North: 0, South: 1, East: 2, West: 3
 const NORTH: Vector2i = Vector2(0, 1)
@@ -39,6 +44,7 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 	# Get the maze, set the start and goal positions, and store the maze size.
 	maze = new_maze
 	maze_size = size
+	maze_area = maze_size.x * maze_size.y
 	goal = maze_size - start
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
@@ -48,27 +54,32 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 	starting_solutions.front().print_details() 
 	
 	#starting_solutions[0].mutate(100)
-	starting_solutions[0] = mutate_and_validate(starting_solutions[0], 1)
-	
+	#starting_solutions[0] = mutate_and_validate(starting_solutions[0], 1)
 	
 	starting_solutions.front().print_details()
 
 func generate_random_solutions() -> void:
+	# Set the array size for the array storing all the solutions
 	starting_solutions.resize(starting_solution_size)
+	
+	# Create the needed number of solutions. 
+	# Each solution is just a random path through the maze, and can pass through walls and not have the goal
 	for solution_number in range(starting_solution_size):
-		var solution: Beepath = Beepath.new()
+		# Initialise a new path. This object just stores the coordinates of each cell in the path, the directions needed to create the path, and a function to print all the details.
+		var solution: Beepath = Beepath.new(maze_area)
+		# Additional costs for intersecting walls and not having goals is stored in this.
+		# This then needs to be passed into the bee path object
+		var solution_cost: int = 0
 		
 		# Add the start of the maze as the start of the bee path
 		solution.points.push_front(start)
 		
-		# Go in a random direction, if the new position isnt a wall, add it to the solution.
-		# Repeat this until the goal cell is in the solution
+		# Go in a random direction, if its within the maze store it and go in another random direction
+		# Repeat this until the goal cell is in the solution or the max size is reached
 		var current_direction: int
-		
 		var current_position = start
 		
-		var keep_looping = true
-		while(keep_looping):
+		for i in range(maze_area):
 			var previous_position = current_position
 			var looking_for_neighbour = true
 			while (looking_for_neighbour):
@@ -85,16 +96,26 @@ func generate_random_solutions() -> void:
 					3: # West
 						current_position += WEST
 						current_direction = 3
-				if (!maze[current_position.x][current_position.y].is_wall):
+				if (current_position > Vector2i(0, 0) && current_position < maze_size):
 					looking_for_neighbour = false
 				else:
 					current_position = previous_position
-				
-				solution.points.push_back(current_position)
-				solution.direction_string.push_back(current_direction)
+					
+			# A neighbour within the maze has been found. If the new location is a wall, increase the solution's cost
+			if (maze[current_position.x][current_position.y].is_wall):
+				solution_cost += wall_cost
 			
-			if (solution.points.has(goal)):
-				keep_looping = false
+			# If the current position is the goal, there's no need to keep the for loop going
+			# If the current position isnt the goal, and we're at the end of the for loop, add a cost for not finding the goal
+			if (current_position == goal):
+				break
+			elif (i == maze_area - 1):
+				solution_cost += no_goal_cost
+			
+			# Update the solution with a new point, direction, and a potential additional cost
+			solution.points.push_back(current_position)
+			solution.direction_string.push_back(current_direction)
+			solution.calculate_fitness(solution_cost)
 		
 		# Add solution to the array of solutions
 		starting_solutions[solution_number - 1] = solution

@@ -46,9 +46,11 @@ func _ready() -> void:
 	## Get the new maze from the pathfinder
 	#maze = a_star.maze
 	
-	# Run the Bees Algorithm on the given maze
-	var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	maze = bees.maze
+	## Run the Bees Algorithm on the given maze
+	#var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	#maze = bees.maze
+	
+	var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	
 	visualise_maze()
 

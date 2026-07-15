@@ -4,13 +4,17 @@ var north: int = 0
 var south: int = 1
 var east: int = 2
 var west: int = 3
-#var delete: 4
+#var delete: int: 4
 
-var points: Array[Vector2i]
-var direction_string: Array[int]
+var points: Array[Vector2i] # Coordinates of each cell this path goes through. Includes repeating points
+var direction_string: Array[int] # A list of directions needed to travel to recreate the path
+var max_size: int # Should be equal to the area of the maze. If a path is longer than this it shouldnt be considered
 
-func _init() -> void:
-	pass
+var cost: int # Lower cost equals better solution. If a solution is long, goes through walls, or doesnt reach the goal it will have a higher cost
+
+func _init(size: int) -> void:
+	max_size = size
+	cost = 0
 
 func print_details() -> void:
 	#print("Points:\n")
@@ -22,11 +26,12 @@ func print_details() -> void:
 	
 	print("Number of points: ", points.size())
 	print("Size of directionstring: ", direction_string.size())
+	print("Cost: ", cost)
 	print("\n\n")
 
-func calculate_fitness() -> int:
-	var fitness: int = points.size()
-	return fitness
+func calculate_fitness(added_cost) -> void:
+	cost = points.size()
+	cost += added_cost
 
 # After mutate is called, the solution needs to be retested to see if it's still valid
 func mutate(number_of_changes: int) -> void:

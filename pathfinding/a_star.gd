@@ -1,9 +1,11 @@
 class_name Astar
 
+# To keep things consistent when testing pathfinding algorithms in random mazes,
+# the start will always be the top left cell and the goal the bottom right cell for now.
 var start: Vector2i = Vector2i(1, 1)
 var goal: Vector2i
 
-var maze: Array
+var maze: Array # A copy of the maze created by the maze generator
 var maze_size: Vector2i
 #var open_list: Array[Vector2i]
 #var closed_list: Array[Vector2i]
@@ -26,6 +28,7 @@ func pathfinding() -> void:
 	print("Start: ", start)
 	print("Goal: ", goal)
 	var current_position: Vector2i = start
+	# For some reason, using the open list array didnt work so now its a bool each cell has instead.
 	maze[current_position.x][current_position.y].open_list = true
 	#open_list[array_counter] = current_position
 	
@@ -69,13 +72,13 @@ func pathfinding() -> void:
 
 func check_neighbour_positions(current_position: Vector2i) -> void:
 	var north = current_position + Vector2i(0, -1)
-	var north_west = current_position + Vector2i(-1, -1)
+	#var north_west = current_position + Vector2i(-1, -1)
 	var west = current_position + Vector2i(-1, 0)
-	var south_west = current_position + Vector2i(-1, 1)
+	#var south_west = current_position + Vector2i(-1, 1)
 	var south = current_position + Vector2i(0, 1)
-	var south_east = current_position + Vector2i(1, 1)
+	#var south_east = current_position + Vector2i(1, 1)
 	var east = current_position + Vector2i(1, 0)
-	var north_east = current_position + Vector2i(1, -1)
+	#var north_east = current_position + Vector2i(1, -1)
 	
 	#var neighbours_with_diagonals: Array[Vector2i] = [north, north_west, west, south_west, south, south_east, east, north_east]
 	var neighbours: Array[Vector2i] = [north, west, south, east]
