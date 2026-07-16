@@ -108,6 +108,7 @@ func calculate_costs(node: Vector2i, current_position: Vector2i) -> void:
 
 func manhattan_method(node: Vector2i) -> int:
 	var distance_vector = goal - node
+	# Normalise the distance vector's x and y. Using Godot's built-in normalising method didnt work for some reason
 	if (distance_vector.x < 0):
 		distance_vector.x *= -1
 	if (distance_vector.y < 0):

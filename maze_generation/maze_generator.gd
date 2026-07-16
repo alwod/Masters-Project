@@ -40,17 +40,19 @@ func _ready() -> void:
 	
 	remove_random_walls()
 	
-	## Run the A* pathfinding algorithm on the given maze
-	#var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	#a_star.pathfinding()
-	## Get the new maze from the pathfinder
-	#maze = a_star.maze
+	# Run the A* pathfinding algorithm on the given maze
+	var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	a_star.pathfinding()
 	
 	## Run the Bees Algorithm on the given maze
 	#var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#maze = bees.maze
 	
-	var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	#var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	
+	#var idastar = Idastar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	#idastar.pathfinding()
+	#maze = idastar.maze
 	
 	visualise_maze()
 
@@ -167,17 +169,16 @@ func visualise_maze() -> void:
 				add_child(block)
 			if (maze[i][j].is_goal):
 				goal_position = maze[i][j].grid_position
-	#draw_path(goal_position) #Comment out when testing unfinished pathfinding algorithms
+	draw_path(goal_position) #Comment out when testing unfinished pathfinding algorithms
 
 # Resets the variables connects_to and connected_from as they are needed by pathfinding algorithms
 func reset_connecting_values() -> void:
 	for i in range(MAZE_HEIGHT):
 		for j in range (MAZE_WIDTH):
-			maze[i][j].connects_to = Vector2i(-1, -1)
-			maze[i][j].connected_from = Vector2i(-1, -1)
+			maze[i][j].reset_values()
 
 func draw_path(next_position: Vector2i) -> void:
-	#print(maze[next_position.x][next_position.y].print_details())
+	print(maze[next_position.x][next_position.y].connects_to)
 	if (!maze[next_position.x][next_position.y].is_start):
 		# Draw line between next_position and next_position.connects_to
 		var line: Line2D = line_scene.instantiate()

@@ -28,6 +28,19 @@ func _init(coords: Vector2i) -> void:
 	else:
 		is_wall = false
 
+func reset_values() -> void:
+	visited = false
+	connected_from = Vector2i(-1, -1)
+	connects_to = Vector2i(-1, -1)
+	f_cost = 0
+	g_cost = 0
+	h_cost = 0
+	#is_start = false
+	#is_goal = false
+	open_list = false
+	closed_list = false
+	
+
 func print_details() -> void:
 	print("Position: ", grid_position)
 	print("Visited: ", visited)
