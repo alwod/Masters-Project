@@ -16,6 +16,9 @@ var is_goal: bool = false
 var open_list: bool = false
 var closed_list: bool = false
 
+# Used for D* Lite
+var rhs: int # The Right-Hand-Side is the minimum cost from this node to its neighbours
+
 func _init(coords: Vector2i) -> void:
 	grid_position = coords
 	visited = false

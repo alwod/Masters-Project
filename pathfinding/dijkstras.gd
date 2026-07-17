@@ -39,7 +39,7 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 		
 		var neighbours: Array[Vector2i] = [north, west, south, east]
 		
-		var lowest_cost: int = INF
+		var lowest_cost: float = INF
 		var lowest_cost_neighbour: Vector2i
 		
 		# Calculate the f costs of the current position's unchecked neighbours
