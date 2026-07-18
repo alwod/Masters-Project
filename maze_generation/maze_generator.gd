@@ -54,6 +54,9 @@ func _ready() -> void:
 	#idastar.pathfinding()
 	#maze = idastar.maze
 	
+	var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	dstarlight.pathfinding()
+	
 	visualise_maze()
 	
 	for i in range(MAZE_WIDTH):
