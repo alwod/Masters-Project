@@ -44,6 +44,7 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 		
 		# Calculate the f costs of the current position's unchecked neighbours
 		for neighbour in neighbours:
+			#print(current_position, " ", neighbour)
 			if (!maze[neighbour.x][neighbour.y].closed_list):
 				var new_f_cost = maze[current_position.x][current_position.y].f_cost + movement_cost
 				# The cost of this neighbour hasnt been set to anything yet

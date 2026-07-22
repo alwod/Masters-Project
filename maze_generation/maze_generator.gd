@@ -20,6 +20,8 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
+var number_of_pathfinding_iterations: int = 1
+
 func _ready() -> void:
 	if (use_random_seed):
 		randomize()
@@ -33,12 +35,12 @@ func _ready() -> void:
 	MAZE_WIDTH = (MAZE_WIDTH * 2) + 1
 	
 	initialise_grid()
-
 	aldous_broder()
-	
 	reset_connecting_values()
-	
 	remove_random_walls()
+		
+	# Pathfinding algorithm here
+	var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	
 	# Run the A* pathfinding algorithm on the given maze
 	#var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
@@ -54,19 +56,29 @@ func _ready() -> void:
 	#idastar.pathfinding()
 	#maze = idastar.maze
 	
-	var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	dstarlight.pathfinding()
+	#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	#dstarlight.pathfinding()
 	
 	visualise_maze()
 	
 	for i in range(MAZE_WIDTH):
 		for j in range(MAZE_HEIGHT):
-			print(maze[i][j].grid_position, "connects to ", maze[i][j].connects_to)
+			#print(maze[i][j].grid_position, "connects to ", maze[i][j].connects_to)
+			pass
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
 		get_tree().reload_current_scene()
 
+func test_algorithms() -> void:
+	for i in range(number_of_pathfinding_iterations):
+		initialise_grid()
+		aldous_broder()
+		reset_connecting_values()
+		remove_random_walls()
+		
+		# Pathfinding algorithm here
+		var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 
 func initialise_grid():
 	# Initialise the basic maze as a 2d array
@@ -185,7 +197,7 @@ func reset_connecting_values() -> void:
 			maze[i][j].reset_values()
 
 func draw_path(next_position: Vector2i) -> void:
-	print(maze[next_position.x][next_position.y].connects_to)
+	#print(maze[next_position.x][next_position.y].connects_to)
 	if (!maze[next_position.x][next_position.y].is_start):
 		# Draw line between next_position and next_position.connects_to
 		var line: Line2D = line_scene.instantiate()
