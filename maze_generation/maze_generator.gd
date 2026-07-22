@@ -34,13 +34,7 @@ func _ready() -> void:
 	MAZE_HEIGHT = (MAZE_HEIGHT * 2) + 1
 	MAZE_WIDTH = (MAZE_WIDTH * 2) + 1
 	
-	initialise_grid()
-	aldous_broder()
-	reset_connecting_values()
-	remove_random_walls()
-		
-	# Pathfinding algorithm here
-	var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+	test_algorithms()
 	
 	# Run the A* pathfinding algorithm on the given maze
 	#var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
@@ -79,6 +73,7 @@ func test_algorithms() -> void:
 		
 		# Pathfinding algorithm here
 		var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+		dijkstra.pathfinding()
 
 func initialise_grid():
 	# Initialise the basic maze as a 2d array

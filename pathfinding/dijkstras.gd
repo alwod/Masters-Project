@@ -10,6 +10,8 @@ var maze_size: Vector2i
 
 var movement_cost: int = 1
 
+var priority_queue: Dictionary[Vector2i, int]
+
 func _init(size: Vector2i, new_maze: Array) -> void:
 	maze = new_maze
 	maze_size = size
@@ -17,78 +19,56 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
 	
-	maze[start.x][start.y].f_cost = 0
+	maze[start.x][start.y].g_cost = 0
 	maze[start.x][start.y].closed_list = true
 	
-	var current_position = start
-	
-	var number_of_nodes: int = 0
 	for i in range(maze_size.x):
 		for j in range(maze_size.y):
-			if (!maze[i][j].is_wall):
-				number_of_nodes += 1
+			if(maze[i][j].is_start || maze[i][j].is_wall):
+				pass
 			else:
-				maze[i][j].closed_list = true
-				
-				
-	for count in range(number_of_nodes):
-		var north = current_position + Vector2i(0, -1)
-		var west = current_position + Vector2i(-1, 0)
-		var south = current_position + Vector2i(0, 1)
-		var east = current_position + Vector2i(1, 0)
+				maze[i][j].g_cost = 100000
+	
+	var current_position = start
+	priority_queue[start] = 0
+
+# First, set starting f cost to 0 and all other f costs to INF
+# Add first point to priority queue
+# Get the lowest cost node from the priority queue
+# Check this node's neighbours
+# Calculate each neighbour's g_cost and set thier connects_to to the current node
+# Add each neighbour to the priority queue
+# Get the lowest cost node from the queue
+func pathfinding() -> void:
+	while(!priority_queue.is_empty()):
+		var current_node = find_queue_min()
+		priority_queue.erase(current_node)
+		
+		var north = current_node + Vector2i(0, -1)
+		var west = current_node + Vector2i(-1, 0)
+		var south = current_node + Vector2i(0, 1)
+		var east = current_node + Vector2i(1, 0)
 		
 		var neighbours: Array[Vector2i] = [north, west, south, east]
 		
-		var lowest_cost: float = INF
-		var lowest_cost_neighbour: Vector2i
-		
-		# Calculate the f costs of the current position's unchecked neighbours
 		for neighbour in neighbours:
-			#print(current_position, " ", neighbour)
-			if (!maze[neighbour.x][neighbour.y].closed_list):
-				var new_f_cost = maze[current_position.x][current_position.y].f_cost + movement_cost
-				# The cost of this neighbour hasnt been set to anything yet
-				if (!maze[neighbour.x][neighbour.y].is_start && maze[neighbour.x][neighbour.y].f_cost == 0):
-					maze[neighbour.x][neighbour.y].f_cost = new_f_cost
-				# The cost of this neighbour has been set, but the new cost is better
-				elif (!maze[neighbour.x][neighbour.y].is_start && maze[neighbour.x][neighbour.y].f_cost > new_f_cost):
-					maze[neighbour.x][neighbour.y].f_cost = new_f_cost
-				
-				# Check to see if this neighbour has the lowest cost of the bunch
-				if (maze[neighbour.x][neighbour.y].f_cost < lowest_cost):
-					lowest_cost = maze[neighbour.x][neighbour.y].f_cost
-					lowest_cost_neighbour = neighbour
-					
-		
-		maze[current_position.x][current_position.y].closed_list = true
-		
-		# Next, pick the unchecked neighbour with the lowest cost and set it as the new current position
-		# If all neighbours are already visited, and the for loop isnt complete, need to search the maze array again to make sure there arent any unvisited nodes that arent walls
-		if (lowest_cost_neighbour):
-			current_position = lowest_cost_neighbour
-		else:
-			for i in range(maze_size.x):
-				for j in range(maze_size.y):
-					if (!maze[i][j].closed_list && maze[i][j].f_cost != 0):
-						current_position = maze[i][j].grid_position
-						break
+			if(!maze[neighbour.x][neighbour.y].is_wall):
+				var calculated_g_cost = maze[current_node.x][current_node.y].g_cost + movement_cost
+				if (calculated_g_cost < maze[neighbour.x][neighbour.y].g_cost):
+					maze[neighbour.x][neighbour.y].g_cost = calculated_g_cost
+					maze[neighbour.x][neighbour.y].connects_to = current_node
+					priority_queue[neighbour] = maze[neighbour.x][neighbour.y].g_cost
 	
-	# Print details
-	for i in range(maze_size.x):
-		for j in range(maze_size.y):
-			if (!maze[i][j].is_wall):
-				print("Node: ", maze[i][j].grid_position)
-				print("Distance: ", maze[i][j].f_cost)
-				print("\n")
+	print(maze[goal.x][goal.y].g_cost)
+
+func find_queue_min():
+	var smallest_cost = 100000
+	var smallest_node: Vector2i
+	for node in priority_queue:
+		if (priority_queue[node] < smallest_cost):
+			smallest_cost = priority_queue[node]
+			smallest_node = node
 	
-	# First, pick a random neighbour of the current position
+	var smallest_value: Dictionary = {smallest_node: smallest_cost}
 	
-	# Calculate this neighbours f-cost, by adding the movement cost to the current position's f_cost
-	# If this new cost is lower than the neighbour's is lower than the neighbours f_cost and isnt 0, set it to the neighbours f_cost
-	
-	# Repeat above for all 4 non-wall neighbours of the current position
-	
-	# After all the current position's neighbours are checked, pick the next unvisited neighbour with the lowest f_cost and mark it as visited
-	# Marking a neighbour as visited is done in this case by setting closed list to true
-	
-	# Repeat above for all nodes 
+	return smallest_node
