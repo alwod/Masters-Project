@@ -29,7 +29,6 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 			else:
 				maze[i][j].g_cost = 100000
 	
-	var current_position = start
 	priority_queue[start] = 0
 
 # First, set starting f cost to 0 and all other f costs to INF
@@ -68,7 +67,5 @@ func find_queue_min():
 		if (priority_queue[node] < smallest_cost):
 			smallest_cost = priority_queue[node]
 			smallest_node = node
-	
-	var smallest_value: Dictionary = {smallest_node: smallest_cost}
 	
 	return smallest_node

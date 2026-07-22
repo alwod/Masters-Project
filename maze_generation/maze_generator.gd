@@ -21,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 2
+var number_of_pathfinding_iterations: int = 1
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -71,6 +71,8 @@ func test_algorithms() -> void:
 		# Pathfinding algorithm here
 		var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 		dijkstra.pathfinding()
+		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
+		## TODO Add methods of storing the memory use, loop iterations, time, and path length, transfering from the algorithm class to data gatherer class
 
 func initialise_grid():
 	# Initialise the basic maze as a 2d array
