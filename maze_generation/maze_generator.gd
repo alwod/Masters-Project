@@ -3,6 +3,7 @@ extends Node
 @export var MAZE_WIDTH: int
 @export var MAZE_HEIGHT: int
 var unvisited_cells: int
+var og_unvisited_cells: int
 var maze: Array
 
 @export var use_random_seed: bool = false
@@ -20,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 1
+var number_of_pathfinding_iterations: int = 2
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -29,6 +30,7 @@ func _ready() -> void:
 		seed(12345)
 	
 	unvisited_cells = MAZE_HEIGHT * MAZE_WIDTH
+	og_unvisited_cells = unvisited_cells
 	
 	# Modify the grid size, so that each "walkable" cell is surrounded by "wall" cells.
 	MAZE_HEIGHT = (MAZE_HEIGHT * 2) + 1
@@ -53,12 +55,7 @@ func _ready() -> void:
 	#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#dstarlight.pathfinding()
 	
-	visualise_maze()
-	
-	for i in range(MAZE_WIDTH):
-		for j in range(MAZE_HEIGHT):
-			#print(maze[i][j].grid_position, "connects to ", maze[i][j].connects_to)
-			pass
+	#visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
@@ -88,6 +85,8 @@ func initialise_grid():
 func aldous_broder() -> void:
 	var current_position: Vector2i
 	var previous_position: Vector2i
+	
+	unvisited_cells = og_unvisited_cells
 	
 	# Start at a random cell, making sure it's a walkable cell and not a wall cell
 	var loop_2 = true
