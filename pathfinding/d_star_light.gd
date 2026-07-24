@@ -29,6 +29,16 @@ class DKey:
 		key_s = key_secondary
 		
 
+# Variables for data collection
+var time: int = 0
+var iterations: int = 0
+var memory_use: float
+var path_length: int = 0
+
+var biggest_memory_use = 0
+var start_time
+var start_memory_use
+
 func _init(size: Vector2i, new_maze: Array) -> void:
 	maze = new_maze
 	maze_size = size
@@ -37,6 +47,9 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 	maze[goal.x][goal.y].is_goal = true
 
 func pathfinding() -> void:
+	start_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+	start_time = Time.get_ticks_usec()
+	
 	# First, make sure priority queue is empty
 	priority_queue.clear()
 	# Also make sure the key modifier is 0
@@ -44,8 +57,8 @@ func pathfinding() -> void:
 	# Make sure every node has a g and rhs value of infinite
 	for i in range(maze_size.x):
 		for j in range(maze_size.y):
-			maze[i][j].g_cost = 100000
-			maze[i][j].rhs = 100000
+			maze[i][j].g_cost = 100000000
+			maze[i][j].rhs = 100000000
 		
 	# Add the goal node to the priority queue. Its rhs should always be 0
 	maze[goal.x][goal.y].rhs = 0
@@ -57,6 +70,7 @@ func pathfinding() -> void:
 func compute_shortest_path() -> void:
 	var max_steps = MAX_CYCLES
 	while (priority_queue.size() > 0 && (compare_keys(find_queue_min().values().front(), calculate_key(start), "less_than") || maze[start.x][start.y].rhs > maze[start.x][start.y].g_cost)):
+		iterations += 1
 		max_steps -= 1
 		if (max_steps <= 0):
 			break # Didnt find a path
@@ -81,7 +95,7 @@ func compute_shortest_path() -> void:
 			#print("\n")
 		else:
 			var old_g = maze[node.x][node.y].g_cost
-			maze[node.x][node.y].g_cost = 100000
+			maze[node.x][node.y].g_cost = 100000000
 			
 			# Check all neighbours of the node AND the node itself
 			var neighbours_and_node = find_neighbours(node)
@@ -89,14 +103,25 @@ func compute_shortest_path() -> void:
 			for neighbour in neighbours_and_node:
 				if (maze[neighbour.x][neighbour.y].rhs == movement_cost + old_g):
 					if (!maze[neighbour.x][neighbour.y].is_goal):
-						maze[neighbour.x][neighbour.y].rhs = 100000
+						maze[neighbour.x][neighbour.y].rhs = 100000000
 					
 					for neighbour_prime in find_neighbours(neighbour):
 						maze[neighbour.x][neighbour.y].rhs = mini(maze[neighbour.x][neighbour.y].rhs, movement_cost + maze[neighbour_prime.x][neighbour_prime.y].g_cost)
 						
 				update_vertex(neighbour)
+		
+		#print(smallest_key.key_p)
+		
+		var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+		if (temp_memory_use > biggest_memory_use):
+			biggest_memory_use = temp_memory_use
+	
+	var end_time = Time.get_ticks_usec()
+	time = end_time - start_time
+	memory_use = biggest_memory_use - start_memory_use
 	
 	maze[start.x][start.y].g_cost = maze[start.x][start.y].rhs
+	path_length = maze[start.x][start.y].g_cost
 	print("Shortest path found in ", MAX_CYCLES - max_steps, " steps")
 	print(maze[start.x][start.y].g_cost)
 
@@ -129,7 +154,7 @@ func update_vertex(node: Vector2i) -> void:
 
 # Sorting a dictionary sorts it by key and not by value, so this function returns the smallest value 
 func find_queue_min():
-	var smallest_key: DKey = DKey.new(1000000, 1000000)
+	var smallest_key: DKey = DKey.new(100000000, 100000000)
 	var smallest_node: Vector2i
 	for node in priority_queue:
 		if (compare_keys(priority_queue[node], smallest_key, "less_than")):
@@ -139,7 +164,6 @@ func find_queue_min():
 	var smallest_value: Dictionary = {smallest_node: smallest_key}
 	
 	return smallest_value
-	
 
 func calculate_key(node: Vector2i) -> DKey:
 	var key_secondary: int = mini(maze[node.x][node.y].g_cost, maze[node.x][node.y].rhs)

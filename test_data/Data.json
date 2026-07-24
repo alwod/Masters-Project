@@ -1,0 +1,9 @@
+[
+{
+"Name": "A*",
+"Map Type": "100x100 Static",
+"Memory Usage (bytes)": 88472.0,
+"Path Length": 788,
+"Time (microseconds)": 3147896,
+"Loop Iterations": 18939
+}]

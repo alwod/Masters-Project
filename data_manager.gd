@@ -31,8 +31,8 @@ func create_json() -> void:
 	for i in range(memory_usage.size()):
 		data += "{\n"
 		
-		data += '"Name": ' + algorithm_used + ",\n"
-		data += '"Map Type": ' + map_type + ",\n"
+		data += '"Name": ' + JSON.stringify(algorithm_used) + ",\n"
+		data += '"Map Type": ' + JSON.stringify(map_type) + ",\n"
 		data += '"Memory Usage (bytes)": ' + JSON.stringify(memory_usage[i]) + ",\n"
 		data += '"Path Length": ' + JSON.stringify(path_length[i]) + ",\n"
 		data += '"Time (microseconds)": ' + JSON.stringify(time_to_complete[i]) + ",\n"

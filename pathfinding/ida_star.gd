@@ -14,6 +14,14 @@ var limit: int
 var pruned_list: Dictionary[Vector2i, int]
 var searching: bool = true
 
+# Variables for data collection
+var time: int = 0
+var iterations: int = 0
+var memory_use: float
+var path_length: int = 0
+
+var biggest_memory_use = 0
+
 func _init(size: Vector2i, new_maze: Array) -> void:
 	maze = new_maze
 	maze_size = size
@@ -22,6 +30,9 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 	maze[goal.x][goal.y].is_goal = true
 
 func pathfinding() -> void:
+	var start_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+	var start_time = Time.get_ticks_usec()
+	
 	maze[start.x][start.y].h_cost = manhattan_method(start)
 	maze[start.x][start.y].g_cost = 0
 	maze[start.x][start.y].f_cost = maze[start.x][start.y].g_cost + maze[start.x][start.y].h_cost
@@ -32,6 +43,8 @@ func pathfinding() -> void:
 	# Every loop here counts as one iteration. The pruned_list dictionary should be reset each time
 	var iteration_count = 0
 	while(searching):
+		iterations += 1
+		
 		# Iteration is done, reset info
 		for i in range(maze_size.x):
 			for j in range (maze_size.y):
@@ -39,7 +52,7 @@ func pathfinding() -> void:
 		
 		maze[current_position.x][current_position.y].visited = true
 		iteration_count += 1
-		print("Iteration ", iteration_count, " Limit: ", limit)
+		#print("Iteration ", iteration_count, " Limit: ", limit)
 		# Find the lowest F cost in the pruned_list dictionary, set it as the limit
 		var costs = pruned_list.values()
 		#print(pruned_list)
@@ -51,6 +64,16 @@ func pathfinding() -> void:
 		
 		# Check the neighbours of the starting node
 		check_neighbours(current_position)
+		
+		var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+		if (temp_memory_use > biggest_memory_use):
+			biggest_memory_use = temp_memory_use
+	
+	var end_time = Time.get_ticks_usec()
+	time = end_time - start_time
+	memory_use = biggest_memory_use - start_memory_use
+	
+	path_length = maze[goal.x][goal.y].f_cost
 
 func check_neighbours(current_position: Vector2i) -> void:
 	#print(current_position, " ", maze[current_position.x][current_position.y].f_cost)

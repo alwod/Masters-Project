@@ -21,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 3
+var number_of_pathfinding_iterations: int = 1
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -55,14 +55,14 @@ func _ready() -> void:
 	#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#dstarlight.pathfinding()
 	
-	#visualise_maze()
+	visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
 		get_tree().reload_current_scene()
 
 func test_algorithms() -> void:
-	var test_data = Datamanager.new("Dijkstra's", "100x100 Static")
+	var test_data = Datamanager.new("A*", "100x100 Static")
 	
 	for i in range(number_of_pathfinding_iterations):
 		print("Generating maze ", i + 1)
@@ -75,10 +75,24 @@ func test_algorithms() -> void:
 		print("Maze generation ", i + 1, " complete in ", maze_generation_end - maze_generation_start, "ms")
 		
 		# Pathfinding algorithm here
-		var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-		dijkstra.pathfinding()
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
-		test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
+		#var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+		#dijkstra.pathfinding()
+		#test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
+		
+		#var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+		#a_star.pathfinding_v2()
+		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
+		
+		## TODO Fix IDAStar
+		var idastar = Idastar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+		idastar.pathfinding()
+		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		
+		#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
+		#dstarlight.pathfinding()
+		#test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
+		
 	test_data.create_json()
 
 func initialise_grid():

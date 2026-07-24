@@ -35,7 +35,7 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 			if(maze[i][j].is_start || maze[i][j].is_wall):
 				pass
 			else:
-				maze[i][j].g_cost = 100000
+				maze[i][j].g_cost = 100000000
 	
 	priority_queue[start] = 0
 
@@ -86,7 +86,7 @@ func pathfinding() -> void:
 	print("Time (us): ", time, " Iterations: ", iterations, " Memory use (bytes): ", memory_use, " Path length: ", path_length)
 
 func find_queue_min():
-	var smallest_cost = 100000
+	var smallest_cost = 100000000
 	var smallest_node: Vector2i
 	for node in priority_queue:
 		if (priority_queue[node] < smallest_cost):
