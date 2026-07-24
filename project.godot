@@ -14,10 +14,18 @@ config/name="MastersProject"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+ManagedMemoryMonitor="*uid://derrps0v30pwm"
+
 [editor]
 
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/managed_memory_monitor/plugin.cfg")
 
 [input]
 

@@ -11,7 +11,14 @@ var maze_size: Vector2i
 #var closed_list: Array[Vector2i]
 
 var diagonal_movement_cost: int = 14
-var movement_cost: int = 10
+var movement_cost: int = 1
+
+# Variables for data collection
+var time: int = 0
+var iterations: int = 0
+var memory_use: float
+var path_length: int = 0
+var biggest_memory_use = 0
 
 func _init(size: Vector2i, new_maze: Array) -> void:
 	maze = new_maze
@@ -114,4 +121,4 @@ func manhattan_method(node: Vector2i) -> int:
 	if (distance_vector.y < 0):
 		distance_vector.y *= -1
 	var h_cost = distance_vector.x + distance_vector.y
-	return h_cost * 10
+	return h_cost * 1

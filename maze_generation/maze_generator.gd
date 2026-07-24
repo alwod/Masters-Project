@@ -21,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 1
+var number_of_pathfinding_iterations: int = 3
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -62,17 +62,24 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 
 func test_algorithms() -> void:
+	var test_data = Datamanager.new("Dijkstra's", "100x100 Static")
+	
 	for i in range(number_of_pathfinding_iterations):
+		print("Generating maze ", i + 1)
+		var maze_generation_start = Time.get_ticks_msec()
 		initialise_grid()
 		aldous_broder()
 		reset_connecting_values()
 		remove_random_walls()
+		var maze_generation_end = Time.get_ticks_msec()
+		print("Maze generation ", i + 1, " complete in ", maze_generation_end - maze_generation_start, "ms")
 		
 		# Pathfinding algorithm here
 		var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 		dijkstra.pathfinding()
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
-		## TODO Add methods of storing the memory use, loop iterations, time, and path length, transfering from the algorithm class to data gatherer class
+		test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
+	test_data.create_json()
 
 func initialise_grid():
 	# Initialise the basic maze as a 2d array

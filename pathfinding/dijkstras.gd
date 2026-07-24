@@ -18,6 +18,8 @@ var iterations: int = 0
 var memory_use: float
 var path_length: int = 0
 
+var biggest_memory_use = 0
+
 func _init(size: Vector2i, new_maze: Array) -> void:
 	maze = new_maze
 	maze_size = size
@@ -46,7 +48,6 @@ func _init(size: Vector2i, new_maze: Array) -> void:
 # Get the lowest cost node from the queue
 func pathfinding() -> void:
 	var start_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
-	print("Start memory use: ", start_memory_use)
 	var start_time = Time.get_ticks_usec()
 	
 	while(!priority_queue.is_empty()):
@@ -71,24 +72,18 @@ func pathfinding() -> void:
 					maze[neighbour.x][neighbour.y].connects_to = current_node
 					priority_queue[neighbour] = maze[neighbour.x][neighbour.y].g_cost
 					
-					
+		var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+		if (temp_memory_use > biggest_memory_use):
+			biggest_memory_use = temp_memory_use
 	
-	var end_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+	#var end_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
 	var end_time = Time.get_ticks_usec()
 	time = end_time - start_time
-	memory_use = end_memory_use - start_memory_use
+	memory_use = biggest_memory_use - start_memory_use
 	
 	path_length = maze[goal.x][goal.y].g_cost
 	
 	print("Time (us): ", time, " Iterations: ", iterations, " Memory use (bytes): ", memory_use, " Path length: ", path_length)
-	
-	var test_1 = Performance.get_monitor(Performance.MEMORY_STATIC)
-	var example: bool = true
-	example = false
-	var example2: String = "Hello there!"
-	var test_2 = Performance.get_monitor(Performance.MEMORY_STATIC)
-	
-	print(test_2 - test_1)
 
 func find_queue_min():
 	var smallest_cost = 100000
