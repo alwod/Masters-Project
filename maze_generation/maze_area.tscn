@@ -7,8 +7,9 @@
 
 [node name="MazeArea" type="Node2D" unique_id=2013573728]
 script = ExtResource("1_2040e")
-MAZE_WIDTH = 100
-MAZE_HEIGHT = 100
+MAZE_WIDTH = 50
+MAZE_HEIGHT = 50
+use_random_seed = true
 block_scene = ExtResource("2_pdvix")
 line_scene = ExtResource("3_85k2c")
 maze_scale = 70

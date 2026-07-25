@@ -55,14 +55,14 @@ func _ready() -> void:
 	#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#dstarlight.pathfinding()
 	
-	visualise_maze()
+	#visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
 		get_tree().reload_current_scene()
 
 func test_algorithms() -> void:
-	var test_data = Datamanager.new("A*", "100x100 Static")
+	var test_data = Datamanager.new("Test", "100x100 Static")
 	
 	for i in range(number_of_pathfinding_iterations):
 		print("Generating maze ", i + 1)
@@ -84,9 +84,9 @@ func test_algorithms() -> void:
 		#a_star.pathfinding_v2()
 		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
-		## TODO Fix IDAStar
+		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
 		var idastar = Idastar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-		idastar.pathfinding()
+		idastar.pathfinding_v2()
 		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)

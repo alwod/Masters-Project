@@ -1,9 +1,9 @@
 [
 {
-"Name": "A*",
+"Name": "Test",
 "Map Type": "100x100 Static",
-"Memory Usage (bytes)": 88472.0,
-"Path Length": 788,
-"Time (microseconds)": 3147896,
-"Loop Iterations": 18939
+"Memory Usage (bytes)": 57956.0,
+"Path Length": 368,
+"Time (microseconds)": 1874203,
+"Loop Iterations": 87
 }]
