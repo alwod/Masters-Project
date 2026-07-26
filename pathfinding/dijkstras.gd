@@ -2,7 +2,7 @@ class_name Dijkstras
 
 # To keep things consistent when testing pathfinding algorithms in random mazes,
 # the start will always be the top left cell and the goal the bottom right cell for now.
-var start: Vector2i = Vector2i(1, 1)
+var start: Vector2i
 var goal: Vector2i
 
 var maze: Array # A copy of the maze created by the maze generator
@@ -20,10 +20,11 @@ var path_length: int = 0
 
 var biggest_memory_use = 0
 
-func _init(size: Vector2i, new_maze: Array) -> void:
+func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_position: Vector2i) -> void:
 	maze = new_maze
 	maze_size = size
-	goal = maze_size - start
+	start = starting_position
+	goal = goal_position
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
 	

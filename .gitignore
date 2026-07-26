@@ -17,4 +17,4 @@ data_*/
 mono_crash.*.json
 
 # Custom data ignores
-test_data/*.json
+test_data/Data.json
