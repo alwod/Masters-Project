@@ -17,7 +17,6 @@ var time: int = 0
 var iterations: int = 0
 var memory_use: float
 var path_length: int = 0
-
 var biggest_memory_use = 0
 
 func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_position: Vector2i) -> void:

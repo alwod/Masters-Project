@@ -67,18 +67,18 @@ func test_algorithms() -> void:
 		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
-		var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
-		dijkstra.pathfinding()
-		test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
+		#var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
+		#dijkstra.pathfinding()
+		#test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
 		
 		#var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
 		#a_star.pathfinding_v2()
 		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
-		#var idastar = Idastar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-		#idastar.pathfinding_v2()
-		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
+		idastar.pathfinding_v2()
+		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 		#dstarlight.pathfinding()
