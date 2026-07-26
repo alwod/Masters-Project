@@ -42,28 +42,34 @@ func _ready() -> void:
 	#var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#maze = bees.maze
 	
-	#visualise_maze()
+	visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
-		get_tree().reload_current_scene()
+		generate_maze(0)
+		visualise_maze()
+
+func generate_maze(maze_id: int) -> void:
+	print("Generating maze ", maze_id)
+	var maze_generation_start = Time.get_ticks_msec()
+	initialise_grid()
+	aldous_broder()
+	reset_connecting_values()
+	remove_random_walls()
+	var maze_generation_end = Time.get_ticks_msec()
+	print("Maze generation ", maze_id, " complete in ", maze_generation_end - maze_generation_start, "ms")
 
 func test_algorithms() -> void:
 	var test_data = Datamanager.new("Test", "100x100 Static")
 	
 	for i in range(number_of_pathfinding_iterations):
-		print("Generating maze ", i + 1)
-		var maze_generation_start = Time.get_ticks_msec()
-		initialise_grid()
-		aldous_broder()
-		reset_connecting_values()
-		remove_random_walls()
-		var maze_generation_end = Time.get_ticks_msec()
-		print("Maze generation ", i + 1, " complete in ", maze_generation_end - maze_generation_start, "ms")
+		generate_maze(i + 1)
 		
 		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
 		var start_position = Vector2i(1, 1)
 		var goal_position = adjusted_maze_size - Vector2i(1, 1)
+		
+		modify_maze(start_position, goal_position)
 		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
@@ -80,11 +86,39 @@ func test_algorithms() -> void:
 		#idastar.pathfinding_v2()
 		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
-		var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
-		dstarlight.pathfinding()
-		test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
+		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
+		#dstarlight.pathfinding()
+		#test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
 		
 	test_data.create_json()
+
+func test_algorithms_dynamic_maze() -> void:
+	var test_data = Datamanager.new("Test", "100x100 Static")
+	
+	for i in range(number_of_pathfinding_iterations):
+		print("Generating maze ", i + 1)
+		var maze_generation_start = Time.get_ticks_msec()
+		initialise_grid()
+		aldous_broder()
+		reset_connecting_values()
+		remove_random_walls()
+		var maze_generation_end = Time.get_ticks_msec()
+		print("Maze generation ", i + 1, " complete in ", maze_generation_end - maze_generation_start, "ms")
+		
+		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
+		var start_position = Vector2i(1, 1)
+		var goal_position = adjusted_maze_size - Vector2i(1, 1)
+		
+		# Run a pathfinding algorithm on the maze
+		
+		# After the algorithm is complete, get the path and move the "actor" 1 step towards the goal (represented by changing the start position)
+		# Start recording time and memory useage here
+		
+		# After starting position has changed, modify the maze
+		
+		# If the next starting position is a wall now, re-run the pathfinding algorithm. If not, continue with another step
+		
+		# Continue until start == goal
 
 func initialise_grid():
 	# Initialise the basic maze as a 2d array
@@ -169,6 +203,7 @@ func find_connecting_walls(position_1: Vector2i, position_2: Vector2i) -> void:
 		
 	maze[larger_position.x][larger_position.y].is_wall = false
 
+# With aldous broder, there is only ever 1 path between 2 nodes. By removing random walls there's a chance for multiple paths to the goal.
 func remove_random_walls() -> void:
 	var number_to_remove: int = round(MAZE_HEIGHT / 2)
 	
@@ -183,8 +218,46 @@ func remove_random_walls() -> void:
 			rand_y = randi_range(1, MAZE_WIDTH - offset)
 		maze[rand_x][rand_y].is_wall = false
 
+# Used for dynamic maze testing
+func modify_maze(start: Vector2i, goal: Vector2i) -> void:
+	# Change X random non-wall nodes to wall nodes and X random wall nodes to non-wall nodes
+	# Exclude the start and goal nodes
+	var number_to_change: int = 2
+	
+	var rand_x = randi_range(1, MAZE_HEIGHT - 2)
+	var rand_y = randi_range(1, MAZE_WIDTH - 2)
+	
+	var walls_to_become_nodes: Array[Vector2i]
+	# Change wall nodes to non-wall nodes
+	for n in range(number_to_change - 1):
+		while(!maze[rand_x][rand_y].is_wall || Vector2i(rand_x, rand_y) == start || Vector2i(rand_x, rand_y) == goal):
+			rand_x = randi_range(1, MAZE_HEIGHT - 2)
+			rand_y = randi_range(1, MAZE_WIDTH - 2)
+		walls_to_become_nodes.push_front(Vector2i(rand_x, rand_y))
+	
+	var nodes_to_become_walls: Array[Vector2i]
+	# Change non-wall nodes to wall nodes
+	for n in range(number_to_change - 1):
+		while(maze[rand_x][rand_y].is_wall || Vector2i(rand_x, rand_y) == start || Vector2i(rand_x, rand_y) == goal):
+			rand_x = randi_range(1, MAZE_HEIGHT - 2)
+			rand_y = randi_range(1, MAZE_WIDTH - 2)
+		nodes_to_become_walls.push_front(Vector2i(rand_x, rand_y))
+	
+	for node in walls_to_become_nodes:
+		maze[node.x][node.y].is_wall = false
+	
+	for node in nodes_to_become_walls:
+		maze[node.x][node.y].is_wall = true
 
 func visualise_maze() -> void:
+	# Make sure there arent any scenes already
+	var children = get_children()
+	for child in children:
+		if child.get_groups().has("Camera"):
+			pass
+		else:
+			child.queue_free()
+	
 	var goal_position: Vector2i
 	for i in range(MAZE_HEIGHT):
 		for j in range(MAZE_WIDTH):
@@ -204,13 +277,13 @@ func reset_connecting_values() -> void:
 		for j in range (MAZE_WIDTH):
 			maze[i][j].reset_values()
 
-func draw_path(next_position: Vector2i) -> void:
-	#print(maze[next_position.x][next_position.y].connects_to)
-	if (!maze[next_position.x][next_position.y].is_start):
-		# Draw line between next_position and next_position.connects_to
-		var line: Line2D = line_scene.instantiate()
-		line.add_point(next_position)
-		line.add_point(maze[next_position.x][next_position.y].connects_to)
-		add_child(line)
-		# call draw_path and pass in next_position.connects_to
-		draw_path(maze[next_position.x][next_position.y].connects_to)
+#func draw_path(next_position: Vector2i) -> void:
+	##print(maze[next_position.x][next_position.y].connects_to)
+	#if (!maze[next_position.x][next_position.y].is_start):
+		## Draw line between next_position and next_position.connects_to
+		#var line: Line2D = line_scene.instantiate()
+		#line.add_point(next_position)
+		#line.add_point(maze[next_position.x][next_position.y].connects_to)
+		#add_child(line)
+		## call draw_path and pass in next_position.connects_to
+		#draw_path(maze[next_position.x][next_position.y].connects_to)
