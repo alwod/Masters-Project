@@ -38,22 +38,13 @@ func _ready() -> void:
 	
 	test_algorithms()
 	
-	# Run the A* pathfinding algorithm on the given maze
-	#var a_star = Astar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	#a_star.pathfinding()
+	
 	
 	## Run the Bees Algorithm on the given maze
 	#var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#maze = bees.maze
 	
-	#var dijkstra = Dijkstras.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	
-	#var idastar = Idastar.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	#idastar.pathfinding()
-	#maze = idastar.maze
-	
-	#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-	#dstarlight.pathfinding()
 	
 	#visualise_maze()
 

@@ -40,8 +40,8 @@ func pathfinding_v2() -> void:
 	var done = false
 	while (!done):
 		iterations += 1
-		print("Iteration ", iterations)
-		print("Limit ", limit)
+		#print("Iteration ", iterations)
+		#print("Limit ", limit)
 		
 		done = recursive_search(start, 0)
 		if (!done):

@@ -31,11 +31,13 @@ func create_json() -> void:
 	for i in range(memory_usage.size()):
 		data += "{\n"
 		
-		data += '"Name": ' + JSON.stringify(algorithm_used, " iteration ", i) + ",\n"
-		data += '"Map Type": ' + JSON.stringify(map_type) + ",\n"
-		data += '"Memory Usage (bytes)": ' + JSON.stringify(memory_usage[i]) + ",\n"
+		# Convert bytes to kb
+		var memory_kb: float = memory_usage[i] / 1000.0
+		data += '"Memory Usage (kb)": ' + JSON.stringify(memory_kb) + ",\n"
 		data += '"Path Length": ' + JSON.stringify(path_length[i]) + ",\n"
-		data += '"Time (microseconds)": ' + JSON.stringify(time_to_complete[i]) + ",\n"
+		# Convert microseconds into seconds
+		var time_seconds: float = time_to_complete[i] / 1000000.0
+		data += '"Time (seconds)": ' + JSON.stringify(time_seconds) + ",\n"
 		data += '"Loop Iterations": ' + JSON.stringify(number_of_iterations[i]) + "\n"
 		
 		if (i == memory_usage.size() - 1):
