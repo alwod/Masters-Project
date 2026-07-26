@@ -7,8 +7,6 @@ var goal: Vector2i
 
 var maze: Array # A copy of the maze created by the maze generator
 var maze_size: Vector2i
-#var open_list: Array[Vector2i]
-#var closed_list: Array[Vector2i]
 
 var movement_cost: int = 1
 
@@ -34,15 +32,15 @@ var time: int = 0
 var iterations: int = 0
 var memory_use: float
 var path_length: int = 0
-
 var biggest_memory_use = 0
 var start_time
 var start_memory_use
 
-func _init(size: Vector2i, new_maze: Array) -> void:
+func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_position: Vector2i) -> void:
 	maze = new_maze
 	maze_size = size
-	goal = maze_size - start
+	start = starting_position
+	goal = goal_position
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
 

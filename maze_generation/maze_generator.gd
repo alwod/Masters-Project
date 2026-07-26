@@ -76,13 +76,13 @@ func test_algorithms() -> void:
 		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
-		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
-		idastar.pathfinding_v2()
-		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		#var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
+		#idastar.pathfinding_v2()
+		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
-		#var dstarlight = Dstarlight.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
-		#dstarlight.pathfinding()
-		#test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
+		var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
+		dstarlight.pathfinding()
+		test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
 		
 	test_data.create_json()
 
