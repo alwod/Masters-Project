@@ -31,7 +31,9 @@ func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_po
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
 	
-	searched_nodes.resize(maze_size.x * maze_size.y)
+	searched_nodes.resize(5000)
+	for i in range(searched_nodes.size()):
+			searched_nodes[i] = Vector2i(0, 0)
 
 
 func pathfinding_v2() -> void:
@@ -43,7 +45,10 @@ func pathfinding_v2() -> void:
 	maze[start.x][start.y].g_cost = 0
 	var done = false
 	while (!done):
-		searched_nodes.clear()
+		#searched_nodes.clear()
+		for i in range(searched_nodes.size()):
+			searched_nodes[i] = Vector2i(0, 0)
+		
 		array_index_counter = 0
 		iterations += 1
 		#print("Iteration ", iterations)
@@ -54,10 +59,6 @@ func pathfinding_v2() -> void:
 			pruned_list_v2.sort()
 			limit = pruned_list_v2.front()
 			pruned_list_v2.clear()
-		
-		var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
-		if (temp_memory_use > biggest_memory_use):
-			biggest_memory_use = temp_memory_use
 	
 	var end_time = Time.get_ticks_usec()
 	time = end_time - start_time
@@ -72,13 +73,18 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 	if (h == 0):
 		return true # The goal was found
 	
-	searched_nodes.push_front(node)
+	#searched_nodes.push_front(node)
+	searched_nodes[array_index_counter] = node
 	array_index_counter += 1
 	
 	var f: int = g + h
 	if (f > limit):
 		# Add this value of F to the pruned list
 		pruned_list_v2.push_front(f)
+		
+		var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+		if (temp_memory_use > biggest_memory_use):
+			biggest_memory_use = temp_memory_use
 		return false
 	
 	var north = node + Vector2i(0, -1)
@@ -92,18 +98,26 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 			pass
 		elif searched_nodes.has(neighbour):
 			if (g + movement_cost < maze[neighbour.x][neighbour.y].g_cost):
-				searched_nodes.erase(neighbour)
-				
-				
+				#searched_nodes.erase(neighbour)
+				searched_nodes[array_index_counter] = Vector2i(0, 0)
 				maze[neighbour.x][neighbour.y].g_cost = g + movement_cost
 				var done = recursive_search(neighbour, g + movement_cost)
 				if (done):
+					var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+					if (temp_memory_use > biggest_memory_use):
+						biggest_memory_use = temp_memory_use
 					return true
 		else:
 			maze[neighbour.x][neighbour.y].g_cost = g + movement_cost
 			var done = recursive_search(neighbour, g + movement_cost)
 			if (done):
+				var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+				if (temp_memory_use > biggest_memory_use):
+					biggest_memory_use = temp_memory_use
 				return true
+	var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+	if (temp_memory_use > biggest_memory_use):
+		biggest_memory_use = temp_memory_use
 	return false
 
 func manhattan_method(node: Vector2i) -> int:

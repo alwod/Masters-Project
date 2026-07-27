@@ -21,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 1000
+var number_of_pathfinding_iterations: int = 100
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -47,7 +47,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
 		test_algorithms()
-		visualise_maze()
+		#visualise_maze()
 
 func generate_maze(maze_id: int) -> void:
 	print("Generating maze ", maze_id)
@@ -67,7 +67,6 @@ func generate_maze(maze_id: int) -> void:
 # Very large 45x45 -> 89x89 = 7921 search area
 func test_algorithms() -> void:
 	var test_data = Datamanager.new("Test", "100x100 Static")
-	
 	for i in range(number_of_pathfinding_iterations):
 		generate_maze(i + 1)
 		
@@ -80,20 +79,21 @@ func test_algorithms() -> void:
 		var goal_position = corners.pick_random()
 		print("Maze goal position: ", goal_position)
 		
+		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
 		#var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dijkstra.pathfinding()
 		#test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
 		
-		#var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
-		#a_star.pathfinding_v2()
-		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
+		var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
+		a_star.pathfinding_v2()
+		test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
-		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
-		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
-		idastar.pathfinding_v2()
-		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		### 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster
+		#var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
+		#idastar.pathfinding_v2()
+		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dstarlight.pathfinding()
