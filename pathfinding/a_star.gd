@@ -25,7 +25,7 @@ func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_po
 	maze = new_maze
 	maze_size = size
 	start = starting_position
-	goal = maze_size - Vector2i(1, 1)
+	goal = goal_position
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
 

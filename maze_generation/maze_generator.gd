@@ -21,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 1
+var number_of_pathfinding_iterations: int = 1000
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -42,7 +42,7 @@ func _ready() -> void:
 	#var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#maze = bees.maze
 	
-	visualise_maze()
+	#visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
@@ -62,10 +62,10 @@ func generate_maze(maze_id: int) -> void:
 ## Map sizes to test
 # Very small: 3x3 -> 5x5=25 search area - Yes
 # Small 5x5 -> 9x9=81 search area - Yes
-# Medium 10x10 -> 19x19=361 search area - Yes
-# Large 15x15 -> 29x29=841 search area
-# Larger 20x20 -> 39x39=1512 search area - Yes
-# Largerer 25x25 -> 49x49= 2401 search area
+# Medium 10x10 -> 19x19=361 search area
+# Large 15x15 -> 29x29=841 search area - Yes
+# Larger 20x20 -> 39x39=1512 search area
+# Largerer 25x25 -> 49x49= 2401 search area - Yes
 # Very Large 50x50 -> 99x99 = 9801 search area
 func test_algorithms() -> void:
 	var test_data = Datamanager.new("Test", "100x100 Static")
@@ -74,29 +74,35 @@ func test_algorithms() -> void:
 		generate_maze(i + 1)
 		
 		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
-		var start_position = Vector2i(1, 1)
-		var goal_position = adjusted_maze_size - Vector2i(1, 1)
+		# Start position should be in the center
+		var start_position = Vector2i((MAZE_HEIGHT - 1) / 2, (MAZE_WIDTH - 1) / 2)
+		print("Maze starting position: ", start_position)
+		# Goal position should be a random corner
+		var corners: Array[Vector2i] = [Vector2i(1, 1), Vector2i(MAZE_HEIGHT - 2, 1), Vector2i(1, MAZE_WIDTH - 2), Vector2i(MAZE_HEIGHT - 2, MAZE_WIDTH - 2)]
+		var goal_position = corners.pick_random()
+		print("Maze goal position: ", goal_position)
 		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
-		#var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
-		#dijkstra.pathfinding()
-		#test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
+		var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
+		dijkstra.pathfinding()
+		test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
 		
 		#var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
 		#a_star.pathfinding_v2()
 		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
-		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
-		idastar.pathfinding_v2()
-		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		#var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
+		#idastar.pathfinding_v2()
+		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dstarlight.pathfinding()
 		#test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
 		
 	test_data.create_json()
+	print("Test Done!!!")
 
 func test_algorithms_dynamic_maze() -> void:
 	var test_data = Datamanager.new("Test", "100x100 Static")
@@ -264,7 +270,6 @@ func visualise_maze() -> void:
 		else:
 			child.queue_free()
 	
-	var goal_position: Vector2i
 	for i in range(MAZE_HEIGHT):
 		for j in range(MAZE_WIDTH):
 			if (maze[i][j].is_wall):
@@ -274,8 +279,19 @@ func visualise_maze() -> void:
 				block.position = block_pos
 				add_child(block)
 			if (maze[i][j].is_goal):
-				goal_position = maze[i][j].grid_position
-	#draw_path(goal_position) #Comment out when testing unfinished pathfinding algorithms
+				var block_pos: Vector2i = maze[i][j].grid_position
+				block_pos = block_pos * maze_scale
+				var block: Sprite2D = block_scene.instantiate()
+				block.position = block_pos
+				block.texture = preload("uid://b532w2ibqhu8j")
+				add_child(block)
+			if (maze[i][j].is_start):
+				var block_pos: Vector2i = maze[i][j].grid_position
+				block_pos = block_pos * maze_scale
+				var block: Sprite2D = block_scene.instantiate()
+				block.position = block_pos
+				block.texture = preload("uid://v30so2fvqn5i")
+				add_child(block)
 
 # Resets the variables connects_to and connected_from as they are needed by pathfinding algorithms
 func reset_connecting_values() -> void:

@@ -12,7 +12,6 @@ var movement_cost: int = 1
 
 var limit: int
 var pruned_list_v2: Array[int]
-var searched_nodes: Array[Vector2i]
 
 # Variables for data collection
 var time: int = 0
@@ -38,15 +37,14 @@ func pathfinding_v2() -> void:
 	var done = false
 	while (!done):
 		iterations += 1
-		#print("Iteration ", iterations)
-		#print("Limit ", limit)
+		print("Iteration ", iterations)
+		print("Limit ", limit)
 		
 		done = recursive_search(start, 0)
 		if (!done):
 			pruned_list_v2.sort()
 			limit = pruned_list_v2.front()
 			pruned_list_v2.clear()
-			searched_nodes.clear()
 		
 		var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
 		if (temp_memory_use > biggest_memory_use):
@@ -58,10 +56,9 @@ func pathfinding_v2() -> void:
 	
 	path_length = limit
 	
-	print("Limit ", limit)
+	print("Final Limit ", limit)
 
 func recursive_search(node: Vector2i, g: int) -> bool:
-	searched_nodes.push_front(node)
 	var h = manhattan_method(node)
 	if (h == 0):
 		return true # The goal was found
@@ -79,7 +76,7 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 			
 	var neighbours: Array[Vector2i] = [north, west, south, east]
 	for neighbour in neighbours:
-		if (maze[neighbour.x][neighbour.y].is_wall || searched_nodes.has(neighbour)):
+		if (maze[neighbour.x][neighbour.y].is_wall):
 			pass
 		else:
 			var done = recursive_search(neighbour, g + movement_cost)
