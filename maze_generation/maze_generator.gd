@@ -21,7 +21,7 @@ const WEST: Vector2i = Vector2(-2, 0)
 
 @export var maze_scale: int
 
-var number_of_pathfinding_iterations: int = 1000
+var number_of_pathfinding_iterations: int = 1
 
 func _ready() -> void:
 	if (use_random_seed):
@@ -61,6 +61,7 @@ func generate_maze(maze_id: int) -> void:
 
 ## Map sizes to test
 # Very small: 3x3 -> 5x5=25 search area - Yes
+# 7x7 -> 15x15=225
 # Small 5x5 -> 9x9=81 search area - Yes
 # Medium 15x15 -> 29x29=841 search area - Yes
 # Large 25x25 -> 49x49= 2401 search area - Yes
@@ -97,7 +98,7 @@ func test_algorithms() -> void:
 		
 		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dstarlight.pathfinding()
-		#test_data.push_data(dstarlight.biggest_memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
+		#test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
 		
 	test_data.create_json()
 	print("Test Done!!!")

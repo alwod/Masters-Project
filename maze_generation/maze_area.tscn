@@ -7,8 +7,8 @@
 
 [node name="MazeArea" type="Node2D" unique_id=2013573728]
 script = ExtResource("1_2040e")
-MAZE_WIDTH = 25
-MAZE_HEIGHT = 25
+MAZE_WIDTH = 3
+MAZE_HEIGHT = 3
 block_scene = ExtResource("2_pdvix")
 line_scene = ExtResource("3_85k2c")
 maze_scale = 70

@@ -14,7 +14,7 @@ var limit: int
 var pruned_list_v2: Array[int]
 
 var searched_nodes: Array[Vector2i]
-var array_index_counter: int
+#var array_index_counter: int
 
 # Variables for data collection
 var time: int = 0
@@ -24,20 +24,20 @@ var path_length: int = 0
 var biggest_memory_use = 0
 
 func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_position: Vector2i) -> void:
+	var start_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+	print(start_memory_use)
+	
 	maze = new_maze
 	maze_size = size
 	start = starting_position
 	goal = goal_position
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
-	
-	searched_nodes.resize(6000)
-	for i in range(searched_nodes.size()):
-			searched_nodes[i] = Vector2i(0, 0)
-
 
 func pathfinding_v2() -> void:
 	var start_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
+	print(start_memory_use)
+	
 	var start_time = Time.get_ticks_usec()
 	
 	limit = manhattan_method(start)
@@ -45,11 +45,8 @@ func pathfinding_v2() -> void:
 	maze[start.x][start.y].g_cost = 0
 	var done = false
 	while (!done):
-		#searched_nodes.clear()
-		for i in range(searched_nodes.size()):
-			searched_nodes[i] = Vector2i(0, 0)
-		
-		array_index_counter = 0
+		searched_nodes.clear()
+	
 		#iterations += 1
 		#print("Iteration ", iterations)
 		#print("Limit ", limit)
@@ -74,9 +71,8 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 	if (h == 0):
 		return true # The goal was found
 	
-	#searched_nodes.push_front(node)
-	searched_nodes[array_index_counter] = node
-	array_index_counter += 1
+	searched_nodes.push_front(node)
+	
 	
 	var f: int = g + h
 	if (f > limit):
@@ -99,8 +95,8 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 			pass
 		elif searched_nodes.has(neighbour):
 			if (g + movement_cost < maze[neighbour.x][neighbour.y].g_cost):
-				#searched_nodes.erase(neighbour)
-				searched_nodes[array_index_counter] = Vector2i(0, 0)
+				searched_nodes.erase(neighbour)
+				#searched_nodes[array_index_counter] = Vector2i(0, 0)
 				maze[neighbour.x][neighbour.y].g_cost = g + movement_cost
 				var done = recursive_search(neighbour, g + movement_cost)
 				if (done):
