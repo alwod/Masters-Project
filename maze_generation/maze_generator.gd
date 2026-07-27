@@ -46,7 +46,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
-		generate_maze(0)
+		test_algorithms()
 		visualise_maze()
 
 func generate_maze(maze_id: int) -> void:
@@ -59,6 +59,14 @@ func generate_maze(maze_id: int) -> void:
 	var maze_generation_end = Time.get_ticks_msec()
 	print("Maze generation ", maze_id, " complete in ", maze_generation_end - maze_generation_start, "ms")
 
+## Map sizes to test
+# Very small: 3x3 -> 5x5=25 search area - Yes
+# Small 5x5 -> 9x9=81 search area - Yes
+# Medium 10x10 -> 19x19=361 search area - Yes
+# Large 15x15 -> 29x29=841 search area
+# Larger 20x20 -> 39x39=1512 search area - Yes
+# Largerer 25x25 -> 49x49= 2401 search area
+# Very Large 50x50 -> 99x99 = 9801 search area
 func test_algorithms() -> void:
 	var test_data = Datamanager.new("Test", "100x100 Static")
 	
@@ -68,8 +76,6 @@ func test_algorithms() -> void:
 		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
 		var start_position = Vector2i(1, 1)
 		var goal_position = adjusted_maze_size - Vector2i(1, 1)
-		
-		modify_maze(start_position, goal_position)
 		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
@@ -82,9 +88,9 @@ func test_algorithms() -> void:
 		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
-		#var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
-		#idastar.pathfinding_v2()
-		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
+		idastar.pathfinding_v2()
+		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dstarlight.pathfinding()

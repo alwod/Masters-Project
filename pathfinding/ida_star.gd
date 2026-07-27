@@ -70,7 +70,7 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 	if (f > limit):
 		# Add this value of F to the pruned list
 		pruned_list_v2.push_front(f)
-		return false # Dead end found
+		return false
 	
 	var north = node + Vector2i(0, -1)
 	var west = node + Vector2i(-1, 0)
