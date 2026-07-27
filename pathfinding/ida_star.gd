@@ -31,7 +31,7 @@ func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_po
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
 	
-	searched_nodes.resize(5000)
+	searched_nodes.resize(6000)
 	for i in range(searched_nodes.size()):
 			searched_nodes[i] = Vector2i(0, 0)
 
@@ -50,7 +50,7 @@ func pathfinding_v2() -> void:
 			searched_nodes[i] = Vector2i(0, 0)
 		
 		array_index_counter = 0
-		iterations += 1
+		#iterations += 1
 		#print("Iteration ", iterations)
 		#print("Limit ", limit)
 		
@@ -69,6 +69,7 @@ func pathfinding_v2() -> void:
 	print("Final Limit ", limit)
 
 func recursive_search(node: Vector2i, g: int) -> bool:
+	iterations += 1
 	var h = manhattan_method(node)
 	if (h == 0):
 		return true # The goal was found
