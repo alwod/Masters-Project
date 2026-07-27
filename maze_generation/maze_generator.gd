@@ -62,11 +62,9 @@ func generate_maze(maze_id: int) -> void:
 ## Map sizes to test
 # Very small: 3x3 -> 5x5=25 search area - Yes
 # Small 5x5 -> 9x9=81 search area - Yes
-# Medium 10x10 -> 19x19=361 search area
-# Large 15x15 -> 29x29=841 search area - Yes
-# Larger 20x20 -> 39x39=1512 search area
-# Largerer 25x25 -> 49x49= 2401 search area - Yes
-# Very Large 50x50 -> 99x99 = 9801 search area
+# Medium 15x15 -> 29x29=841 search area - Yes
+# Large 25x25 -> 49x49= 2401 search area - Yes
+# Very large 45x45 -> 89x89 = 7921 search area
 func test_algorithms() -> void:
 	var test_data = Datamanager.new("Test", "100x100 Static")
 	
@@ -84,18 +82,18 @@ func test_algorithms() -> void:
 		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
-		var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
-		dijkstra.pathfinding()
-		test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
+		#var dijkstra = Dijkstras.new(maze, adjusted_maze_size, start_position, goal_position)
+		#dijkstra.pathfinding()
+		#test_data.push_data(dijkstra.memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
 		
 		#var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
 		#a_star.pathfinding_v2()
 		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		## 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster but doesnt find shortest path
-		#var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
-		#idastar.pathfinding_v2()
-		#test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
+		idastar.pathfinding_v2()
+		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dstarlight.pathfinding()

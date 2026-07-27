@@ -76,7 +76,6 @@ func compute_shortest_path() -> void:
 		var smallest_key = find_queue_min().values().front()
 		var node = find_queue_min().keys().front()
 		priority_queue.erase(node)
-		
 		if (compare_keys(smallest_key, calculate_key(node), "less_than")):
 			var new_key = calculate_key(node)
 			priority_queue[node] = new_key
@@ -88,6 +87,8 @@ func compute_shortest_path() -> void:
 				if (!maze[neighbour.x][neighbour.y].is_goal):
 					maze[neighbour.x][neighbour.y].rhs = mini(maze[neighbour.x][neighbour.y].rhs, movement_cost + maze[node.x][node.y].g_cost)
 					#print(neighbour, " ", maze[neighbour.x][neighbour.y].g_cost, " ", maze[neighbour.x][neighbour.y].rhs)
+					if (maze[neighbour.x][neighbour.y].is_start):
+						print("Found start")
 				
 				update_vertex(neighbour)
 			#print("\n")

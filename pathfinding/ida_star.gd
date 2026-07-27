@@ -13,6 +13,9 @@ var movement_cost: int = 1
 var limit: int
 var pruned_list_v2: Array[int]
 
+var searched_nodes: Array[Vector2i]
+var array_index_counter: int
+
 # Variables for data collection
 var time: int = 0
 var iterations: int = 0
@@ -27,6 +30,8 @@ func _init(new_maze: Array, size: Vector2i, starting_position: Vector2i, goal_po
 	goal = goal_position
 	maze[start.x][start.y].is_start = true
 	maze[goal.x][goal.y].is_goal = true
+	
+	searched_nodes.resize(maze_size.x * maze_size.y)
 
 
 func pathfinding_v2() -> void:
@@ -34,11 +39,15 @@ func pathfinding_v2() -> void:
 	var start_time = Time.get_ticks_usec()
 	
 	limit = manhattan_method(start)
+	maze[start.x][start.y].h_cost = limit
+	maze[start.x][start.y].g_cost = 0
 	var done = false
 	while (!done):
+		searched_nodes.clear()
+		array_index_counter = 0
 		iterations += 1
-		print("Iteration ", iterations)
-		print("Limit ", limit)
+		#print("Iteration ", iterations)
+		#print("Limit ", limit)
 		
 		done = recursive_search(start, 0)
 		if (!done):
@@ -63,6 +72,9 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 	if (h == 0):
 		return true # The goal was found
 	
+	searched_nodes.push_front(node)
+	array_index_counter += 1
+	
 	var f: int = g + h
 	if (f > limit):
 		# Add this value of F to the pruned list
@@ -78,7 +90,17 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 	for neighbour in neighbours:
 		if (maze[neighbour.x][neighbour.y].is_wall):
 			pass
+		elif searched_nodes.has(neighbour):
+			if (g + movement_cost < maze[neighbour.x][neighbour.y].g_cost):
+				searched_nodes.erase(neighbour)
+				
+				
+				maze[neighbour.x][neighbour.y].g_cost = g + movement_cost
+				var done = recursive_search(neighbour, g + movement_cost)
+				if (done):
+					return true
 		else:
+			maze[neighbour.x][neighbour.y].g_cost = g + movement_cost
 			var done = recursive_search(neighbour, g + movement_cost)
 			if (done):
 				return true
