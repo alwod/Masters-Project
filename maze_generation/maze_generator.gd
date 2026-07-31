@@ -42,12 +42,12 @@ func _ready() -> void:
 	#var bees = Beesalgorithm.new(Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1), maze)
 	#maze = bees.maze
 	
-	#visualise_maze()
+	visualise_maze()
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("regenerate"):
 		test_algorithms()
-		#visualise_maze()
+		visualise_maze()
 
 func generate_maze(maze_id: int) -> void:
 	print("Generating maze ", maze_id)
@@ -61,7 +61,6 @@ func generate_maze(maze_id: int) -> void:
 
 ## Map sizes to test
 # Very small: 3x3 -> 5x5=25 search area - Yes
-# 7x7 -> 15x15=225
 # Small 5x5 -> 9x9=81 search area - Yes
 # Medium 15x15 -> 29x29=841 search area - Yes
 # Large 25x25 -> 49x49= 2401 search area - Yes
@@ -89,16 +88,16 @@ func test_algorithms() -> void:
 		
 		#var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
 		#a_star.pathfinding_v2()
-		#test_data.push_data(a_star.memory_use, a_star.path_length, a_star.time, a_star.iterations)
+		#test_data.push_data(a_star.biggest_memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		### 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster
 		var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
 		idastar.pathfinding_v2()
-		test_data.push_data(idastar.memory_use, idastar.path_length, idastar.time, idastar.iterations)
+		test_data.push_data(idastar.biggest_memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
 		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
 		#dstarlight.pathfinding()
-		#test_data.push_data(dstarlight.memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
+		#test_data.push_data(dstarlight.biggest_memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
 		
 	test_data.create_json()
 	print("Test Done!!!")
