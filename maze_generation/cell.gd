@@ -3,8 +3,9 @@ class_name Cell
 var grid_position: Vector2i # Used for maze generation
 var visited: bool # Used for maze generation
 var connected_from: Vector2i # Used for maze generation
-
 var connects_to: Vector2i # Used for maze generation and A*
+var neighbours: Array[Vector2] # Used for node merging
+var movement_cost: int = 1 # Used for node merging
 var is_wall: bool # Used for maze generation A*
 
 # Used for A*

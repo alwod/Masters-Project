@@ -8,8 +8,7 @@ var maze: Array
 
 @export var use_random_seed: bool = false
 
-var first_cell: Vector2i
-var final_cell: Vector2i
+var saved_nodes: Array[Vector2i] # Used for node merging
 
 const NORTH: Vector2i = Vector2(0, 2)
 const SOUTH: Vector2i = Vector2(0, -2)
@@ -20,6 +19,9 @@ const WEST: Vector2i = Vector2(-2, 0)
 @export var line_scene: PackedScene
 
 @export var maze_scale: int
+
+var start_position
+var goal_position
 
 var number_of_pathfinding_iterations: int = 1
 
@@ -56,6 +58,18 @@ func generate_maze(maze_id: int) -> void:
 	aldous_broder()
 	reset_connecting_values()
 	remove_random_walls()
+	
+	# Start position should be in the center
+	start_position = Vector2i((MAZE_HEIGHT - 1) / 2, (MAZE_WIDTH - 1) / 2)
+	maze[start_position.x][start_position.y].is_start = true
+	print("Maze starting position: ", start_position)
+	# Goal position should be a random corner
+	var corners: Array[Vector2i] = [Vector2i(1, 1), Vector2i(MAZE_HEIGHT - 2, 1), Vector2i(1, MAZE_WIDTH - 2), Vector2i(MAZE_HEIGHT - 2, MAZE_WIDTH - 2)]
+	goal_position = corners.pick_random()
+	maze[goal_position.x][goal_position.y].is_goal = true
+	print("Maze goal position: ", goal_position)
+	
+	merge_nodes()
 	var maze_generation_end = Time.get_ticks_msec()
 	print("Maze generation ", maze_id, " complete in ", maze_generation_end - maze_generation_start, "ms")
 
@@ -71,13 +85,7 @@ func test_algorithms() -> void:
 		generate_maze(i + 1)
 		
 		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
-		# Start position should be in the center
-		var start_position = Vector2i((MAZE_HEIGHT - 1) / 2, (MAZE_WIDTH - 1) / 2)
-		print("Maze starting position: ", start_position)
-		# Goal position should be a random corner
-		var corners: Array[Vector2i] = [Vector2i(1, 1), Vector2i(MAZE_HEIGHT - 2, 1), Vector2i(1, MAZE_WIDTH - 2), Vector2i(MAZE_HEIGHT - 2, MAZE_WIDTH - 2)]
-		var goal_position = corners.pick_random()
-		print("Maze goal position: ", goal_position)
+		
 		
 		
 		# Pathfinding algorithm here
@@ -102,33 +110,100 @@ func test_algorithms() -> void:
 	test_data.create_json()
 	print("Test Done!!!")
 
-func test_algorithms_dynamic_maze() -> void:
-	var test_data = Datamanager.new("Test", "100x100 Static")
+func merge_nodes() -> void:
+	# First, iterate through the maze and set each non-wall node's neighbours
+	for i in range(MAZE_HEIGHT):
+		for j in range(MAZE_WIDTH):
+			if (!maze[i][j].is_wall):
+				var node_position = maze[i][j].grid_position
+				var north = node_position + Vector2i(0, -1)
+				var west = node_position + Vector2i(-1, 0)
+				var south = node_position + Vector2i(0, 1)
+				var east = node_position + Vector2i(1, 0)
+		
+				var neighbours: Array[Vector2i] = [north, west, south, east]
+				for neighbour in neighbours:
+					if (!maze[neighbour.x][neighbour.y].is_wall):
+						maze[i][j].neighbours.push_front(neighbour)
+						
+	# If a node isnt a wall, goal, or start, check if it has 1 or 2 neighbours
+	# If the node does have 1 or 2 neighbours, add it to the saved nodes list and check its neighbours
+	# If the neighbour isnt a goal or start, and has 1 or 2 neighbours, add it to the saved list and check its neighbours
+	# Keep searching neighbours until a node has only the start or goal as neighbours, or it has more than 2 neighbours
+	# After neighbour searching has stopped, go through each node in the saved list:
+	# If the node has a neighbour that isnt in the saved list, mark that node as an end node
+	# If the node has a neighbour that is in the saved list, remove that node from the current node's neighbour list
+	# Of the end nodes, pick the one with the best f-cost. If there are other end nodes, their remaining neighbours are now neighbours to the chosen node
+	#print(maze[1][1].is_goal)
+	for i in range(MAZE_HEIGHT):
+		for j in range(MAZE_WIDTH):
+			search_neighbours(Vector2i(i, j))
+			if saved_nodes.size() > 1:
+				var end_nodes: Dictionary[Vector2i, int]
+				var non_saved_nodes: Array[Vector2i]
+				var chosen_end_node: Vector2i
+				
+				for node in saved_nodes:
+					for neighbour in maze[node.x][node.y].neighbours:
+						if (!saved_nodes.has(neighbour)):
+							end_nodes[node] = manhattan_method(node)
+				
+				chosen_end_node = find_queue_min(end_nodes)
+				if end_nodes.size() > 1:
+					end_nodes.erase(chosen_end_node)
+					
+					for remaining_end_node in end_nodes:
+						maze[chosen_end_node.x][chosen_end_node.y].neighbours.append_array(maze[remaining_end_node.x][remaining_end_node.y].neighbours)
+					
+					for neighbour in maze[chosen_end_node.x][chosen_end_node.y].neighbours:
+						for remaining_end_node in end_nodes:
+							if maze[neighbour.x][neighbour.y].neighbours.has(remaining_end_node):
+								maze[neighbour.x][neighbour.y].neighbours.erase(remaining_end_node)
+								maze[neighbour.x][neighbour.y].neighbours.push_front(chosen_end_node)
+						if saved_nodes.has(neighbour):
+							maze[chosen_end_node.x][chosen_end_node.y].neighbours.erase(neighbour)
+					
+				
+				maze[chosen_end_node.x][chosen_end_node.y].movement_cost = saved_nodes.size()
+			
+			saved_nodes.clear()
+			
+	#print(maze[2][1].neighbours)
+
+func search_neighbours(node: Vector2i) -> void:
+	# If the node is a wall, ignore
+	if (maze[node.x][node.y].is_wall):
+		return
+	# If the node is the goal or the start node or it has been visited already ignore as well
+	elif (maze[node.x][node.y].is_start || maze[node.x][node.y].is_goal || maze[node.x][node.y].visited):
+		return
+	elif (maze[node.x][node.y].neighbours.size() > 2):
+		return
+	else:
+		saved_nodes.push_front(node)
+		maze[node.x][node.y].visited = true
+		for neighbour in maze[node.x][node.y].neighbours:
+			search_neighbours(neighbour)
+
+func manhattan_method(node: Vector2i) -> int:
+	var distance_vector = goal_position - node
+	# Normalise the distance vector's x and y. Using Godot's built-in normalising method didnt work for some reason
+	if (distance_vector.x < 0):
+		distance_vector.x *= -1
+	if (distance_vector.y < 0):
+		distance_vector.y *= -1
+	var h_cost = distance_vector.x + distance_vector.y
+	return h_cost
+
+func find_queue_min(queue: Dictionary) -> Vector2i:
+	var smallest_cost = 100000000
+	var smallest_node: Vector2i
+	for node in queue:
+		if (queue[node] < smallest_cost):
+			smallest_cost = queue[node]
+			smallest_node = node
 	
-	for i in range(number_of_pathfinding_iterations):
-		print("Generating maze ", i + 1)
-		var maze_generation_start = Time.get_ticks_msec()
-		initialise_grid()
-		aldous_broder()
-		reset_connecting_values()
-		remove_random_walls()
-		var maze_generation_end = Time.get_ticks_msec()
-		print("Maze generation ", i + 1, " complete in ", maze_generation_end - maze_generation_start, "ms")
-		
-		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
-		var start_position = Vector2i(1, 1)
-		var goal_position = adjusted_maze_size - Vector2i(1, 1)
-		
-		# Run a pathfinding algorithm on the maze
-		
-		# After the algorithm is complete, get the path and move the "actor" 1 step towards the goal (represented by changing the start position)
-		# Start recording time and memory useage here
-		
-		# After starting position has changed, modify the maze
-		
-		# If the next starting position is a wall now, re-run the pathfinding algorithm. If not, continue with another step
-		
-		# Continue until start == goal
+	return smallest_node
 
 func initialise_grid():
 	# Initialise the basic maze as a 2d array
@@ -153,7 +228,6 @@ func aldous_broder() -> void:
 		if (!maze[current_position.x][current_position.y].is_wall):
 			loop_2 = false
 	
-	first_cell = current_position
 	maze[current_position.x][current_position.y].visited = true
 	unvisited_cells -= 1
 	
@@ -189,7 +263,6 @@ func aldous_broder() -> void:
 			maze[previous_position.x][previous_position.y].connected_from = current_position
 			find_connecting_walls(previous_position, current_position)
 			
-	final_cell = current_position
 
 func find_connecting_walls(position_1: Vector2i, position_2: Vector2i) -> void:
 	# First, subtract the current cell from the cell position it connects to
