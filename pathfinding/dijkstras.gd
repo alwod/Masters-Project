@@ -8,8 +8,6 @@ var goal: Vector2i
 var maze: Array # A copy of the maze created by the maze generator
 var maze_size: Vector2i
 
-var movement_cost: int = 1
-
 var priority_queue: Dictionary[Vector2i, int]
 
 # Variables for data collection
@@ -64,9 +62,9 @@ func pathfinding() -> void:
 		
 		var neighbours: Array[Vector2i] = [north, west, south, east]
 		
-		for neighbour in neighbours:
+		for neighbour in maze[current_node.x][current_node.y].neighbours:
 			if(!maze[neighbour.x][neighbour.y].is_wall):
-				var calculated_g_cost = maze[current_node.x][current_node.y].g_cost + movement_cost
+				var calculated_g_cost = maze[current_node.x][current_node.y].g_cost + maze[neighbour.x][neighbour.y].movement_cost
 				if (calculated_g_cost < maze[neighbour.x][neighbour.y].g_cost):
 					maze[neighbour.x][neighbour.y].g_cost = calculated_g_cost
 					maze[neighbour.x][neighbour.y].connects_to = current_node

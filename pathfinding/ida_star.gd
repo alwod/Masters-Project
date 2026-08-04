@@ -43,8 +43,8 @@ func pathfinding_v2() -> void:
 		#searched_nodes.clear()
 	
 		iterations += 1
-		#print("Iteration ", iterations)
-		#print("Limit ", limit)
+		print("Iteration ", iterations)
+		print("Limit ", limit)
 		
 		done = recursive_search(start, 0)
 		if (!done):
@@ -99,8 +99,8 @@ func recursive_search(node: Vector2i, g: int) -> bool:
 						#biggest_memory_use = temp_memory_use
 					#return true
 		else:
-			maze[neighbour.x][neighbour.y].g_cost = g + maze[node.x][node.y].movement_cost
-			var done = recursive_search(neighbour, g + maze[node.x][node.y].movement_cost)
+			maze[neighbour.x][neighbour.y].g_cost = g + maze[neighbour.x][neighbour.y].movement_cost
+			var done = recursive_search(neighbour, maze[neighbour.x][neighbour.y].g_cost)
 			if (done):
 				var temp_memory_use = Performance.get_monitor(Performance.MEMORY_STATIC)
 				if (temp_memory_use > biggest_memory_use):

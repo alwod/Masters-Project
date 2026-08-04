@@ -12,7 +12,6 @@ var open_list_dic: Dictionary[Vector2i, int]
 var closed_list_dic: Dictionary[Vector2i, int]
 
 #var diagonal_movement_cost: int = 14
-var movement_cost: int = 1
 
 # Variables for data collection
 var time: int = 0
@@ -52,11 +51,11 @@ func pathfinding_v2() -> void:
 		
 		var neighbours: Array[Vector2i] = [north, west, south, east]
 		
-		for neighbour in neighbours:
+		for neighbour in maze[current_node.x][current_node.y].neighbours:
 			if(maze[neighbour.x][neighbour.y].is_wall || closed_list_dic.has(neighbour)):
 				pass
 			elif !open_list_dic.has(neighbour):
-				var calculated_g_cost = maze[current_node.x][current_node.y].g_cost + movement_cost
+				var calculated_g_cost = maze[current_node.x][current_node.y].g_cost + maze[neighbour.x][neighbour.y].movement_cost
 				var calculated_h_cost = manhattan_method(neighbour)
 				var calculated_f_cost = calculated_g_cost + calculated_h_cost
 				maze[neighbour.x][neighbour.y].g_cost = calculated_g_cost
@@ -66,8 +65,8 @@ func pathfinding_v2() -> void:
 				open_list_dic[neighbour] = calculated_f_cost
 			else:
 				var old_g = maze[neighbour.x][neighbour.y].g_cost
-				if maze[current_node.x][current_node.y].g_cost + movement_cost < old_g:
-					maze[neighbour.x][neighbour.y].g_cost = maze[current_node.x][current_node.y].g_cost + movement_cost
+				if maze[current_node.x][current_node.y].g_cost + maze[neighbour.x][neighbour.y].movement_cost < old_g:
+					maze[neighbour.x][neighbour.y].g_cost = maze[current_node.x][current_node.y].g_cost + maze[neighbour.x][neighbour.y].movement_cost
 					maze[neighbour.x][neighbour.y].f_cost = maze[neighbour.x][neighbour.y].g_cost + maze[neighbour.x][neighbour.y].h_cost
 					
 					open_list_dic[neighbour] = maze[neighbour.x][neighbour.y].f_cost
