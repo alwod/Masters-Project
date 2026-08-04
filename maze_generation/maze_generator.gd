@@ -86,7 +86,7 @@ func test_algorithms() -> void:
 		
 		var adjusted_maze_size: Vector2i = Vector2i(MAZE_HEIGHT - 1, MAZE_WIDTH - 1)
 		
-		
+		#print(maze[2][9].neighbours)
 		
 		# Pathfinding algorithm here
 		## TODO When testing an algorithm, make sure unused variables in Cell are commented out temporarily
@@ -142,11 +142,11 @@ func merge_nodes() -> void:
 				var end_nodes: Dictionary[Vector2i, int]
 				var non_saved_nodes: Array[Vector2i]
 				var chosen_end_node: Vector2i
-				
 				for node in saved_nodes:
 					for neighbour in maze[node.x][node.y].neighbours:
 						if (!saved_nodes.has(neighbour)):
 							end_nodes[node] = manhattan_method(node)
+							non_saved_nodes.push_front(neighbour)
 				
 				chosen_end_node = find_queue_min(end_nodes)
 				if end_nodes.size() > 1:
@@ -163,12 +163,15 @@ func merge_nodes() -> void:
 						if saved_nodes.has(neighbour):
 							maze[chosen_end_node.x][chosen_end_node.y].neighbours.erase(neighbour)
 					
+					for node in non_saved_nodes:
+						for neighbour in maze[node.x][node.y].neighbours:
+							if saved_nodes.has(neighbour) && neighbour != chosen_end_node:
+								maze[node.x][node.y].neighbours.erase(neighbour)
+								maze[node.x][node.y].neighbours.push_front(chosen_end_node)
 				
 				maze[chosen_end_node.x][chosen_end_node.y].movement_cost = saved_nodes.size()
 			
 			saved_nodes.clear()
-			
-	#print(maze[2][1].neighbours)
 
 func search_neighbours(node: Vector2i) -> void:
 	# If the node is a wall, ignore
