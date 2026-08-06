@@ -8,7 +8,7 @@ var goal: Vector2i
 var maze: Array # A copy of the maze created by the maze generator
 var maze_size: Vector2i
 
-var movement_cost: int = 1
+#var movement_cost: int = 1
 
 var key_modifier: int
 
@@ -85,7 +85,7 @@ func compute_shortest_path() -> void:
 			# Iterate through all this node's neighbours so their rhs values are up to date
 			for neighbour in find_neighbours(node):
 				if (!maze[neighbour.x][neighbour.y].is_goal):
-					maze[neighbour.x][neighbour.y].rhs = mini(maze[neighbour.x][neighbour.y].rhs, movement_cost + maze[node.x][node.y].g_cost)
+					maze[neighbour.x][neighbour.y].rhs = mini(maze[neighbour.x][neighbour.y].rhs, maze[neighbour.x][neighbour.y].movement_cost + maze[node.x][node.y].g_cost)
 					#print(neighbour, " ", maze[neighbour.x][neighbour.y].g_cost, " ", maze[neighbour.x][neighbour.y].rhs)
 					if (maze[neighbour.x][neighbour.y].is_start):
 						print("Found start")
@@ -100,12 +100,12 @@ func compute_shortest_path() -> void:
 			var neighbours_and_node = find_neighbours(node)
 			neighbours_and_node.push_front(node)
 			for neighbour in neighbours_and_node:
-				if (maze[neighbour.x][neighbour.y].rhs == movement_cost + old_g):
+				if (maze[neighbour.x][neighbour.y].rhs == maze[neighbour.x][neighbour.y].movement_cost + old_g):
 					if (!maze[neighbour.x][neighbour.y].is_goal):
 						maze[neighbour.x][neighbour.y].rhs = 100000000
 					
 					for neighbour_prime in find_neighbours(neighbour):
-						maze[neighbour.x][neighbour.y].rhs = mini(maze[neighbour.x][neighbour.y].rhs, movement_cost + maze[neighbour_prime.x][neighbour_prime.y].g_cost)
+						maze[neighbour.x][neighbour.y].rhs = mini(maze[neighbour.x][neighbour.y].rhs, maze[neighbour.x][neighbour.y].movement_cost + maze[neighbour_prime.x][neighbour_prime.y].g_cost)
 						
 				update_vertex(neighbour)
 		
@@ -132,7 +132,7 @@ func find_neighbours(node: Vector2i) -> Array:
 	
 	var neighbours: Array[Vector2i] = [north, west, south, east]
 	var valid_neighbours: Array[Vector2i]
-	for neighbour in neighbours:
+	for neighbour in maze[node.x][node.y].neighbours:
 		if (!maze[neighbour.x][neighbour.y].is_wall):
 			valid_neighbours.push_front(neighbour)
 	

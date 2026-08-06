@@ -94,18 +94,18 @@ func test_algorithms() -> void:
 		#dijkstra.pathfinding()
 		#test_data.push_data(dijkstra.biggest_memory_use, dijkstra.path_length, dijkstra.time, dijkstra.iterations)
 		
-		var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
-		a_star.pathfinding_v2()
-		test_data.push_data(a_star.biggest_memory_use, a_star.path_length, a_star.time, a_star.iterations)
+		#var a_star = Astar.new(maze, adjusted_maze_size, start_position, goal_position)
+		#a_star.pathfinding_v2()
+		#test_data.push_data(a_star.biggest_memory_use, a_star.path_length, a_star.time, a_star.iterations)
 		
 		### 2 versions of IDA. One without the searched_nodes array takes forever. One with it is much faster
 		#var idastar = Idastar.new(maze, adjusted_maze_size, start_position, goal_position)
 		#idastar.pathfinding_v2()
 		#test_data.push_data(idastar.biggest_memory_use, idastar.path_length, idastar.time, idastar.iterations)
 		
-		#var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
-		#dstarlight.pathfinding()
-		#test_data.push_data(dstarlight.biggest_memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
+		var dstarlight = Dstarlight.new(maze, adjusted_maze_size, start_position, goal_position)
+		dstarlight.pathfinding()
+		test_data.push_data(dstarlight.biggest_memory_use, dstarlight.path_length, dstarlight.time, dstarlight.iterations)
 		
 	test_data.create_json()
 	print("Test Done!!!")
@@ -189,7 +189,7 @@ func search_neighbours(node: Vector2i) -> void:
 			search_neighbours(neighbour)
 
 func manhattan_method(node: Vector2i) -> int:
-	var distance_vector = goal_position - node
+	var distance_vector = start_position - node
 	# Normalise the distance vector's x and y. Using Godot's built-in normalising method didnt work for some reason
 	if (distance_vector.x < 0):
 		distance_vector.x *= -1
